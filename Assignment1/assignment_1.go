@@ -7,6 +7,8 @@ import (
 )
 
 func main() {
+
+	fmt.Println("test");
 	channel := make(chan bool)
 	var wg sync.WaitGroup
 

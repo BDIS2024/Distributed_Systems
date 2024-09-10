@@ -1,15 +1,15 @@
 package main
 
-// Sollution INPIRED and NOT COPIED by:
+// Solution INPIRED and NOT COPIED by:
 // https://medium.com/@bararviv0120/dining-philosophers-problem-golang-6b6a1cc2fdb7
 
 /*
 
-	Authered by: Markus Sværke Staael 	(msvs@itu.dk)
-	Authered by: Patrick Shen			(pash@itu.dk)
-	Authered by: Nicky Chengde Ye		(niye@itu.dk)
+	Authored by: Markus Sværke Staael 	(msvs@itu.dk)
+	Authored by: Patrick Shen			(pash@itu.dk)
+	Authored by: Nicky Chengde Ye		(niye@itu.dk)
 
-	This sollution is based on randomness to avoid a deadlock.
+	This solution is based on randomness to avoid a deadlock.
 	Every philosopher will try to grab and then reserve their left fork, then their right.
 	If at any point they fail to do so they will give up their forks and think for a random amount of time.
 	This ensures that at some point every philosopher will get a window to grab and reserve their forks.

@@ -5,6 +5,10 @@ package main
 
 /*
 
+	Authered by: Markus Sværke Staael 	(msvs@itu.dk)
+	Authered by: Patrick Shen			(pash@itu.dk)
+	Authered by: Nicky Chengde Ye		(niye@itu.dk)
+
 	This sollution is based on randomness to avoid a deadlock.
 	Every philosopher will try to grab and then reserve their left fork, then their right.
 	If at any point they fail to do so they will give up their forks and think for a random amount of time.

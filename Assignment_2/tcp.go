@@ -26,9 +26,9 @@ func client(channel chan TCPPackage) {
 	fmt.Printf("Client sent request package with sequence: %d\n", message.seq)
 
 	response := <-channel
-	fmt.Printf("Client pulled out again with sequence : %d\n", response.seq)
 	if response.seq == 0 {
 		channel <- response
+		fmt.Printf("Client pulled out again too early with sequence : %d\n", response.seq)
 		fmt.Printf("Client sent back with sequence: %d\n", response.seq)
 	} else {
 		fmt.Printf("Client retrieved response with sequence: %d\n", response.seq)

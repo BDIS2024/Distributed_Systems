@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 type TCPPackage struct {
@@ -13,11 +12,12 @@ type TCPPackage struct {
 
 func main() {
 	channel := make(chan TCPPackage)
+	done := make(chan int)
 
 	go client(channel)
-	go server(channel)
+	go server(channel, done)
 	fmt.Println("Client and server spawned")
-	time.Sleep(3 * time.Second)
+	<-done
 }
 
 func client(channel chan TCPPackage) {
@@ -40,7 +40,7 @@ func client(channel chan TCPPackage) {
 
 }
 
-func server(channel chan TCPPackage) {
+func server(channel chan TCPPackage, done chan int) {
 	message := <-channel
 	fmt.Printf("Server retrieved package with sequence: %d\n", message.seq)
 	message.seq += 1
@@ -55,7 +55,7 @@ func server(channel chan TCPPackage) {
 	} else {
 		fmt.Printf("Server retrieved with sequence: %d, ack: %d and message: %s\n", response.seq, response.ack, response.message)
 	}
-
+	done <- 1
 }
 
 /*

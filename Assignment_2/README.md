@@ -18,7 +18,7 @@ In our method "clientRecieveSYN" we have implemented a timeout.
 This means if the client does not recieve a message within 5 seconds it will stop trying.
 Ideally you should try and send a request message again, we however do not do this in this program since we are not simulating the message delay. 
 
-Our program has however left room for work on level (3).
+Our program has this way left room for work on level (3).
 
 e) Why is the 3-way handshake important?
 It makes sure that both sides are in sync and tries to establish a connection only when both are ready.

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type TCPPackage struct {
@@ -10,50 +11,88 @@ type TCPPackage struct {
 	ack     int
 }
 
+type ChanSetup struct {
+	in  chan TCPPackage
+	out chan TCPPackage
+}
+
+func hasMessage(channel ChanSetup) bool {
+	return len(channel.in) >= 1
+}
+
 func main() {
-	channel := make(chan TCPPackage)
+	channel1 := make(chan TCPPackage)
+	channel2 := make(chan TCPPackage)
 	done := make(chan int)
 
-	go client(channel)
-	go server(channel, done)
-	fmt.Println("Client and server spawned")
+	go client(ChanSetup{channel1, channel2})
+	go server(ChanSetup{channel2, channel1}, done)
+	fmt.Printf("%s - Client and server spawned\n", time.Now().Format(time.StampNano))
+
 	<-done
 }
 
-func client(channel chan TCPPackage) {
-	message := TCPPackage{"request", 0, 0}
-	channel <- message
-	fmt.Printf("Client sent request package with sequence: %d\n", message.seq)
+// Client methods
 
-	response := <-channel
-	if response.seq == 0 {
-		channel <- response
-		fmt.Printf("Client pulled out again too early with sequence : %d\n", response.seq)
-		fmt.Printf("Client sent back with sequence: %d\n", response.seq)
-	} else {
-		fmt.Printf("Client retrieved response with sequence: %d\n", response.seq)
-		fmt.Printf("Client retrieved response with ack: %d\n", response.ack)
-		response.seq += 1
-		response.ack += 1
-		channel <- response
+func client(channel ChanSetup) {
+	var pack = TCPPackage{"request", 0, 0}
+	clientSendSYN(channel, pack)
+	if clientRecieveSYN(channel, &pack) { // if this method fails we end the handshake (and maybe try again)
+		return
 	}
 
+	clientSendACK(channel, pack)
 }
 
-func server(channel chan TCPPackage, done chan int) {
-	message := <-channel
-	fmt.Printf("Server retrieved package with sequence: %d\n", message.seq)
+func clientSendSYN(channel ChanSetup, pack TCPPackage) { // We send SYN
+	channel.out <- pack
+
+	fmt.Printf("%s - Client sent SYN package: %v\n", time.Now().Format(time.StampNano), pack)
+}
+
+func clientRecieveSYN(channel ChanSetup, pack *TCPPackage) bool {
+	var expectedAck = pack.seq + 1
+	var failure = true
+
+	select {
+	case <-time.After(5 * time.Second): // Timeout after 5 seconds
+		fmt.Printf("%s - Client timed out expecting package.\n", time.Now().Format(time.StampNano))
+
+	case message := <-channel.in: // We recieve message
+		if message.ack != expectedAck { // test if ack nr doesnt fit
+			fmt.Printf("%s - Client recieved message with wrong ack nr. Expected: %d Recieved: %d\n", time.Now().String(), expectedAck, message.ack)
+		} else {
+			fmt.Printf("%s - Client recieved message: %v\n", time.Now().Format(time.StampNano), message)
+			failure = false
+		}
+	}
+	return failure
+}
+
+func clientSendACK(channel ChanSetup, pack TCPPackage) {
+	pack.ack = pack.seq + 1
+
+	channel.out <- pack
+
+	fmt.Printf("%s - Client sent ACK package: %v\n", time.Now().Format(time.StampNano), pack)
+}
+
+// Server methods
+
+func server(channel ChanSetup, done chan int) {
+	message := <-channel.in
+	fmt.Printf("%s - Server retrieved package with sequence: %d\n", time.Now().Format(time.StampNano), message.seq)
 	message.seq += 1
 	message.ack = 1
 
-	channel <- message
-	fmt.Printf("Server sent back response with seq: %d and ack: %d\n", message.seq, message.ack)
+	channel.out <- message
+	fmt.Printf("%s - Server sent back response with seq: %d and ack: %d\n", time.Now().Format(time.StampNano), message.seq, message.ack)
 
-	response := <-channel
+	response := <-channel.in
 	if response.seq == 1 {
-		channel <- response
+		channel.out <- response
 	} else {
-		fmt.Printf("Server retrieved with sequence: %d, ack: %d and message: %s\n", response.seq, response.ack, response.message)
+		fmt.Printf("%s - Server retrieved with sequence: %d, ack: %d and message: %s\n", time.Now().Format(time.StampNano), response.seq, response.ack, response.message)
 	}
 	done <- 1
 }

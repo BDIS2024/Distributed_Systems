@@ -1,0 +1,4 @@
+syntax = "proto3";
+
+go_package = Lecture5/Timeservice
+

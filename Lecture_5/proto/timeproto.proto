@@ -5,7 +5,7 @@ option go_package = "Lecture_5/Timeservice";
 package Timeservice;
 
 message Time{
-    int32 time = 1;
+    string time = 1;
 }
 
 message Empty{

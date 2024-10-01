@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "Lecture5/Timeservice";
+
+package Timeservice;
+
+message Time{
+    int32 time = 1;
+}
+
+message Empty{
+
+}
+
+service Time_service{
+    rpc getTime(Empty) returns (Time){}
+}

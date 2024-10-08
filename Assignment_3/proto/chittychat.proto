@@ -1,0 +1,19 @@
+syntax = 'proto3';
+
+option go_package = 'Assignment_3/proto';
+
+message Message{
+    string message = 1;
+}
+
+message Timestamp{
+    int32 counter = 1;
+}
+
+message Empty{
+}
+
+service ChittyChatService{
+    rpc SendTimestamp(Timestamp) returns(Empty){}
+    rpc SendMessage(Message) returns(Empty){}
+}

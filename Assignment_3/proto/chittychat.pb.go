@@ -20,100 +20,6 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type Message struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-}
-
-func (x *Message) Reset() {
-	*x = Message{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_chittychat_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Message) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Message) ProtoMessage() {}
-
-func (x *Message) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_chittychat_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Message.ProtoReflect.Descriptor instead.
-func (*Message) Descriptor() ([]byte, []int) {
-	return file_proto_chittychat_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *Message) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type Timestamp struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Counter int32 `protobuf:"varint,1,opt,name=counter,proto3" json:"counter,omitempty"`
-}
-
-func (x *Timestamp) Reset() {
-	*x = Timestamp{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_chittychat_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *Timestamp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Timestamp) ProtoMessage() {}
-
-func (x *Timestamp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_chittychat_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Timestamp.ProtoReflect.Descriptor instead.
-func (*Timestamp) Descriptor() ([]byte, []int) {
-	return file_proto_chittychat_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *Timestamp) GetCounter() int32 {
-	if x != nil {
-		return x.Counter
-	}
-	return 0
-}
-
 type Empty struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -123,7 +29,7 @@ type Empty struct {
 func (x *Empty) Reset() {
 	*x = Empty{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_chittychat_proto_msgTypes[2]
+		mi := &file_proto_chittychat_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -136,7 +42,7 @@ func (x *Empty) String() string {
 func (*Empty) ProtoMessage() {}
 
 func (x *Empty) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_chittychat_proto_msgTypes[2]
+	mi := &file_proto_chittychat_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -149,27 +55,131 @@ func (x *Empty) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Empty.ProtoReflect.Descriptor instead.
 func (*Empty) Descriptor() ([]byte, []int) {
+	return file_proto_chittychat_proto_rawDescGZIP(), []int{0}
+}
+
+type Message struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Message   string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Timestamp int32  `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+}
+
+func (x *Message) Reset() {
+	*x = Message{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chittychat_proto_msgTypes[1]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Message) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Message) ProtoMessage() {}
+
+func (x *Message) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chittychat_proto_msgTypes[1]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Message.ProtoReflect.Descriptor instead.
+func (*Message) Descriptor() ([]byte, []int) {
+	return file_proto_chittychat_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Message) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *Message) GetTimestamp() int32 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+type Messages struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Messages []*Message `protobuf:"bytes,1,rep,name=messages,proto3" json:"messages,omitempty"`
+}
+
+func (x *Messages) Reset() {
+	*x = Messages{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_proto_chittychat_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *Messages) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Messages) ProtoMessage() {}
+
+func (x *Messages) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_chittychat_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Messages.ProtoReflect.Descriptor instead.
+func (*Messages) Descriptor() ([]byte, []int) {
 	return file_proto_chittychat_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *Messages) GetMessages() []*Message {
+	if x != nil {
+		return x.Messages
+	}
+	return nil
 }
 
 var File_proto_chittychat_proto protoreflect.FileDescriptor
 
 var file_proto_chittychat_proto_rawDesc = []byte{
 	0x0a, 0x16, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x68, 0x69, 0x74, 0x74, 0x79, 0x63, 0x68,
-	0x61, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x23, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73,
-	0x61, 0x67, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x22, 0x25, 0x0a,
-	0x09, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f,
-	0x75, 0x6e, 0x74, 0x65, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x63, 0x6f, 0x75,
-	0x6e, 0x74, 0x65, 0x72, 0x22, 0x07, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x32, 0x5d, 0x0a,
-	0x11, 0x43, 0x68, 0x69, 0x74, 0x74, 0x79, 0x43, 0x68, 0x61, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69,
-	0x63, 0x65, 0x12, 0x25, 0x0a, 0x0d, 0x53, 0x65, 0x6e, 0x64, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74,
-	0x61, 0x6d, 0x70, 0x12, 0x0a, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x1a,
-	0x06, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x21, 0x0a, 0x0b, 0x53, 0x65, 0x6e,
-	0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x08, 0x2e, 0x4d, 0x65, 0x73, 0x73, 0x61,
-	0x67, 0x65, 0x1a, 0x06, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x42, 0x14, 0x5a, 0x12,
-	0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x6d, 0x65, 0x6e, 0x74, 0x5f, 0x33, 0x2f, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x61, 0x74, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x07, 0x0a, 0x05, 0x45, 0x6d, 0x70, 0x74,
+	0x79, 0x22, 0x41, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x18, 0x0a, 0x07,
+	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x6d,
+	0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74,
+	0x61, 0x6d, 0x70, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73,
+	0x74, 0x61, 0x6d, 0x70, 0x22, 0x30, 0x0a, 0x08, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73,
+	0x12, 0x24, 0x0a, 0x08, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x08, 0x2e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x32, 0x5a, 0x0a, 0x11, 0x43, 0x68, 0x69, 0x74, 0x74, 0x79,
+	0x43, 0x68, 0x61, 0x74, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x21, 0x0a, 0x0b, 0x53,
+	0x65, 0x6e, 0x64, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x08, 0x2e, 0x4d, 0x65, 0x73,
+	0x73, 0x61, 0x67, 0x65, 0x1a, 0x06, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x22, 0x00, 0x12, 0x22,
+	0x0a, 0x0b, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73, 0x12, 0x06, 0x2e,
+	0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x09, 0x2e, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x73,
+	0x22, 0x00, 0x42, 0x14, 0x5a, 0x12, 0x41, 0x73, 0x73, 0x69, 0x67, 0x6e, 0x6d, 0x65, 0x6e, 0x74,
+	0x5f, 0x33, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -186,20 +196,21 @@ func file_proto_chittychat_proto_rawDescGZIP() []byte {
 
 var file_proto_chittychat_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_chittychat_proto_goTypes = []any{
-	(*Message)(nil),   // 0: Message
-	(*Timestamp)(nil), // 1: Timestamp
-	(*Empty)(nil),     // 2: Empty
+	(*Empty)(nil),    // 0: Empty
+	(*Message)(nil),  // 1: Message
+	(*Messages)(nil), // 2: Messages
 }
 var file_proto_chittychat_proto_depIdxs = []int32{
-	1, // 0: ChittyChatService.SendTimestamp:input_type -> Timestamp
-	0, // 1: ChittyChatService.SendMessage:input_type -> Message
-	2, // 2: ChittyChatService.SendTimestamp:output_type -> Empty
-	2, // 3: ChittyChatService.SendMessage:output_type -> Empty
-	2, // [2:4] is the sub-list for method output_type
-	0, // [0:2] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: Messages.messages:type_name -> Message
+	1, // 1: ChittyChatService.SendMessage:input_type -> Message
+	0, // 2: ChittyChatService.GetMessages:input_type -> Empty
+	0, // 3: ChittyChatService.SendMessage:output_type -> Empty
+	2, // 4: ChittyChatService.GetMessages:output_type -> Messages
+	3, // [3:5] is the sub-list for method output_type
+	1, // [1:3] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_chittychat_proto_init() }
@@ -209,7 +220,7 @@ func file_proto_chittychat_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_proto_chittychat_proto_msgTypes[0].Exporter = func(v any, i int) any {
-			switch v := v.(*Message); i {
+			switch v := v.(*Empty); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -221,7 +232,7 @@ func file_proto_chittychat_proto_init() {
 			}
 		}
 		file_proto_chittychat_proto_msgTypes[1].Exporter = func(v any, i int) any {
-			switch v := v.(*Timestamp); i {
+			switch v := v.(*Message); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -233,7 +244,7 @@ func file_proto_chittychat_proto_init() {
 			}
 		}
 		file_proto_chittychat_proto_msgTypes[2].Exporter = func(v any, i int) any {
-			switch v := v.(*Empty); i {
+			switch v := v.(*Messages); i {
 			case 0:
 				return &v.state
 			case 1:

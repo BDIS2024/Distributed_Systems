@@ -1,4 +1,4 @@
-module chittychat
+module Assignment_3
 
 go 1.23.0
 

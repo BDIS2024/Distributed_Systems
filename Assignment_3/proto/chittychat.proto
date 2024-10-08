@@ -2,18 +2,19 @@ syntax = 'proto3';
 
 option go_package = 'Assignment_3/proto';
 
-message Message{
-    string message = 1;
-}
-
-message Timestamp{
-    int32 counter = 1;
-}
-
 message Empty{
 }
 
+message Message{
+    string message = 1;
+    int32 timestamp = 2;
+}
+
+message Messages{
+    repeated Message messages = 1;
+}
+
 service ChittyChatService{
-    rpc SendTimestamp(Timestamp) returns(Empty){}
     rpc SendMessage(Message) returns(Empty){}
+    rpc GetMessages(Empty) returns(Messages){}
 }

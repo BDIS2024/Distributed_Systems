@@ -16,11 +16,11 @@ func main() {
 		log.Fatalf("connection error")
 	}
 
-	client := proto.ChittyChatServiceClient(conn)
+	client := proto.NewChittyChatServiceClient(conn)
 
-	time, err := client.GetMessages(context.Background(), &proto.Empty{})
+	messages, err := client.GetMessages(context.Background(), &proto.Empty{})
 	if err != nil {
 		log.Fatalf("error2")
 	}
-	fmt.Println(time)
+	fmt.Println(messages)
 }

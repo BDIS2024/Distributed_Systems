@@ -11,20 +11,23 @@ import (
 
 type server struct {
 	proto.UnimplementedChittyChatServiceServer
-	messages []*proto.Message
+	messages []string
 }
 
 func (s *server) GetMesssages(ctx context.Context, in *proto.Empty) (*proto.Messages, error) {
 	return &proto.Messages{Messages: s.messages}, nil
 }
 
-func (s *server) SendMessages(ctx context.Context, in *proto.Message) (*proto.Empty, error) {
+func (s *server) SendMessage(ctx context.Context, in *proto.Message) (*proto.Empty, error) {
+	server := &server{}
+	s.messages = append(server.messages, in.Message)
 	return &proto.Empty{}, nil
 }
 
 func main() {
-	server := &server{messages: []*proto.Message{}}
-	server.messages = append(server.messages, &proto.Message{Message: "hello", Timestamp: 1})
+	server := &server{messages: []string{}}
+	server.messages = append(server.messages, "hello")
+	server.messages = append(server.messages, "hello2")
 
 	server.start_server()
 }

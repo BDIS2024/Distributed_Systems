@@ -11,7 +11,7 @@ message Message{
 }
 
 message Messages{
-    repeated Message messages = 1;
+    repeated string messages = 1;
 }
 
 service ChittyChatService{

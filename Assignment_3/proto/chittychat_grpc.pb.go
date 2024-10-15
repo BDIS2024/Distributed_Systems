@@ -27,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChittyChatServiceClient interface {
-	SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Empty, error)
+	SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
 	GetMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Messages, error)
 }
 
@@ -39,9 +39,9 @@ func NewChittyChatServiceClient(cc grpc.ClientConnInterface) ChittyChatServiceCl
 	return &chittyChatServiceClient{cc}
 }
 
-func (c *chittyChatServiceClient) SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Empty, error) {
+func (c *chittyChatServiceClient) SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Empty)
+	out := new(Message)
 	err := c.cc.Invoke(ctx, ChittyChatService_SendMessage_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -63,7 +63,7 @@ func (c *chittyChatServiceClient) GetMessages(ctx context.Context, in *Empty, op
 // All implementations must embed UnimplementedChittyChatServiceServer
 // for forward compatibility.
 type ChittyChatServiceServer interface {
-	SendMessage(context.Context, *Message) (*Empty, error)
+	SendMessage(context.Context, *Message) (*Message, error)
 	GetMessages(context.Context, *Empty) (*Messages, error)
 	mustEmbedUnimplementedChittyChatServiceServer()
 }
@@ -75,7 +75,7 @@ type ChittyChatServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedChittyChatServiceServer struct{}
 
-func (UnimplementedChittyChatServiceServer) SendMessage(context.Context, *Message) (*Empty, error) {
+func (UnimplementedChittyChatServiceServer) SendMessage(context.Context, *Message) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
 func (UnimplementedChittyChatServiceServer) GetMessages(context.Context, *Empty) (*Messages, error) {

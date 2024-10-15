@@ -9,40 +9,38 @@ import (
 	"google.golang.org/grpc"
 )
 
-type server struct {
+type ChittyChatServer struct {
 	proto.UnimplementedChittyChatServiceServer
-	messages []string
+	messages []*proto.Message
 }
 
-func (s *server) GetMesssages(ctx context.Context, in *proto.Empty) (*proto.Messages, error) {
+func (s *ChittyChatServer) GetMessages(ctx context.Context, in *proto.Empty) (*proto.Messages, error) {
 	return &proto.Messages{Messages: s.messages}, nil
 }
 
-func (s *server) SendMessage(ctx context.Context, in *proto.Message) (*proto.Empty, error) {
-	server := &server{}
-	s.messages = append(server.messages, in.Message)
-	return &proto.Empty{}, nil
+func (s *ChittyChatServer) SendMessage(ctx context.Context, in *proto.Message) (*proto.Message, error) {
+	s.messages = append(s.messages, in)
+	return in, nil
 }
 
 func main() {
-	server := &server{messages: []string{}}
-	server.messages = append(server.messages, "hello")
-	server.messages = append(server.messages, "hello2")
-
+	server := &ChittyChatServer{messages: []*proto.Message{}}
 	server.start_server()
 }
 
-func (s *server) start_server() {
+func (s *ChittyChatServer) start_server() {
 	grpcServer := grpc.NewServer()
-	proto.RegisterChittyChatServiceServer(grpcServer, s)
-
 	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {
-		log.Fatalf("connection error")
+		log.Fatalf("Did not work")
 	}
+
+	proto.RegisterChittyChatServiceServer(grpcServer, s)
+
 	err = grpcServer.Serve(listener)
+
 	if err != nil {
-		log.Fatalf("serve error")
+		log.Fatalf("Did not work")
 	}
 
 }

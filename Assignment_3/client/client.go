@@ -18,6 +18,16 @@ func main() {
 
 	client := proto.NewChittyChatServiceClient(conn)
 
+	// setup cli with send message command, get messages command
+	// send messages takes 1 arg the messages to send
+	// get messages takes 0 args
+
+	// *to send message
+	// call sendmessage with message arg
+	// client code will compute a lamport timestamp (nodenr, eventnr)
+	// pass message and timstamp into sendmessage remote function
+	// to compute nodenr when client joining send join request, server will compute an id for client, when new client joins compute another id and send back
+
 	message, errr := client.SendMessage(context.Background(), &proto.Message{Message: "hej", Timestamp: 1})
 	if errr != nil {
 		log.Fatal(err.Error())

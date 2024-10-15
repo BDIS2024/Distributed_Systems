@@ -18,9 +18,11 @@ func main() {
 
 	client := proto.NewChittyChatServiceClient(conn)
 
-	// setup cli with send message command, get messages command
+	// setup cli with send message command, get messages command, join command, quit command,
 	// send messages takes 1 arg the messages to send
 	// get messages takes 0 args
+	// join takes 0 args
+	// quit take 0 args
 
 	// *to send message
 	// call sendmessage with message arg

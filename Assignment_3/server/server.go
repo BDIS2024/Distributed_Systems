@@ -30,15 +30,14 @@ func main() {
 
 func (s *ChittyChatServer) start_server() {
 	grpcServer := grpc.NewServer()
+	proto.RegisterChittyChatServiceServer(grpcServer, s)
+
 	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {
 		log.Fatalf("Did not work")
 	}
 
-	proto.RegisterChittyChatServiceServer(grpcServer, s)
-
 	err = grpcServer.Serve(listener)
-
 	if err != nil {
 		log.Fatalf("Did not work")
 	}

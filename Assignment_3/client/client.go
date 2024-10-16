@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -21,82 +22,70 @@ func main() {
 
 	client := proto.NewChittyChatServiceClient(conn)
 
+	stream, err := client.ChatService(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("enter command\n join to join a session\nquit to quit program\n")
-		command, err := reader.ReadString('\n')
+
+		fmt.Println("type join to join a chat session, type exit to exit program")
+
+		message, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatalf("failed to read")
+			log.Fatal(err.Error())
 		}
+		message = strings.TrimSpace(message)
 
-		command = strings.TrimSpace(command)
-		if command == "join" {
+		if message == "join" {
 			fmt.Println("joined")
-			for {
-				fmt.Print("enter command\n leave to leave\n send to send message\n get to get messages\n")
-				todo, erro := reader.ReadString('\n')
-				todo = strings.TrimSpace(todo)
-				if erro != nil {
-					log.Fatalf("failed to read")
-				}
+			waitc := make(chan struct{})
+			go retrive(waitc, stream)
 
-				if todo == "leave" {
-					fmt.Println("left")
-					break
-				}
+			go send(waitc, stream)
 
-				if todo == "send" {
-					fmt.Println("enter message")
-					tosend, erro := reader.ReadString('\n')
-					if erro != nil {
-						log.Fatalf("failed to read")
-					}
-					tosend = strings.TrimSpace(tosend)
-					sendMessage(client, tosend)
-					getMessages(client)
-				}
-
-				if todo == "get" {
-					getMessages(client)
-				}
-			}
+			<-waitc
 		}
-		if command == "quit" {
+		if message == "exit" {
 			break
 		}
 
 	}
-	fmt.Println("done")
-	// setup cli with send message command, get messages command, join command, quit command,
-	// send messages takes 1 arg the messages to send
-	// get messages takes 0 args
-	// join takes 0 args
-	// quit take 0 args
-
-	// *to send message
-	// call sendmessage with message arg
-	// client code will compute a lamport timestamp (nodenr, eventnr)
-	// pass message and timstamp into sendmessage remote function
-	// to compute nodenr when client joining send join request, server will compute an id for client, when new client joins compute another id and send back
-
-	// this is not live chatting
-	// can use bi directional streaming*
 
 }
 
-func sendMessage(client proto.ChittyChatServiceClient, messag string) {
-	message, err := client.SendMessage(context.Background(), &proto.Message{Message: messag, Timestamp: 1})
-	if err != nil {
-		log.Fatal(err.Error())
+func retrive(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			close(waitc)
+			return
+		}
+
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		fmt.Printf("message: %s timestamp: %d\n", in.Message, in.Timestamp)
 	}
-	log.Printf("Sent message: %s, with timestamp: %d\n", message.Message, message.Timestamp)
 }
 
-func getMessages(client proto.ChittyChatServiceClient) {
-	messages, err := client.GetMessages(context.Background(), &proto.Empty{})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+func send(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
+	for {
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Println("enter message")
+		message, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 
-	fmt.Println(messages.Messages[len(messages.Messages)-1].Message)
+		message = strings.TrimSpace(message)
+
+		if message == "leave" {
+			fmt.Println("!!!!!")
+			close(waitc)
+			return
+		}
+		stream.Send(&proto.Message{Message: message, Timestamp: 1})
+	}
 }

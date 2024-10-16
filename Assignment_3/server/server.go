@@ -2,7 +2,7 @@ package main
 
 import (
 	proto "Assignment_3/proto"
-	"context"
+	"io"
 	"log"
 	"net"
 
@@ -11,20 +11,25 @@ import (
 
 type ChittyChatServer struct {
 	proto.UnimplementedChittyChatServiceServer
-	messages []*proto.Message
 }
 
-func (s *ChittyChatServer) GetMessages(ctx context.Context, in *proto.Empty) (*proto.Messages, error) {
-	return &proto.Messages{Messages: s.messages}, nil
-}
+func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServiceServer) error {
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
 
-func (s *ChittyChatServer) SendMessage(ctx context.Context, in *proto.Message) (*proto.Message, error) {
-	s.messages = append(s.messages, in)
-	return in, nil
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+
+		stream.Send(in)
+	}
 }
 
 func main() {
-	server := &ChittyChatServer{messages: []*proto.Message{}}
+	server := &ChittyChatServer{}
 	server.start_server()
 }
 

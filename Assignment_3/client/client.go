@@ -27,6 +27,16 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("Enter your username")
+
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	username = strings.TrimSpace(username)
+
 	for {
 		reader := bufio.NewReader(os.Stdin)
 
@@ -40,10 +50,11 @@ func main() {
 
 		if message == "join" {
 			fmt.Println("joined")
-			waitc := make(chan struct{})
-			go retrive(waitc, stream)
 
-			go send(waitc, stream)
+			waitc := make(chan struct{})
+
+			go retrieveMessage(waitc, stream, username)
+			go sendMessage(waitc, stream, username)
 
 			<-waitc
 		}
@@ -55,7 +66,7 @@ func main() {
 
 }
 
-func retrive(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
+func retrieveMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient, username string) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -66,11 +77,11 @@ func retrive(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClie
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		fmt.Printf("message: %s timestamp: %d\n", in.Message, in.Timestamp)
+		fmt.Printf("user: %s message: %s timestamp: %s\n", username, in.Message, in.Timestamp)
 	}
 }
 
-func send(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
+func sendMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient, username string) {
 	for {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Println("enter message")
@@ -86,6 +97,9 @@ func send(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient)
 			close(waitc)
 			return
 		}
-		stream.Send(&proto.Message{Message: message, Timestamp: 1})
+		stream.Send(&proto.ClientMessage{
+			Name:      username,
+			Message:   message,
+			Timestamp: "1"})
 	}
 }

@@ -2,13 +2,20 @@ syntax = 'proto3';
 
 option go_package = 'Assignment_3/proto';
 
-message Message{
-    string message = 1;
-    int32 timestamp = 2;
+message ClientMessage{
+    string name = 1;
+    string message = 2;
+    string timestamp = 3;
+}
+
+message ServerMessage{
+    string name = 1;
+    string message = 2;
+    string timestamp = 3;
 }
 
 service ChittyChatService{
-    rpc ChatService (stream Message) returns (stream Message){}
+    rpc ChatService (stream ClientMessage) returns (stream ServerMessage){}
 }
 
 // to compile

@@ -58,14 +58,14 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 			addClient(clientName, stream)
 		}
 
-		broadcastMessage(MessageObject{
+		broadcastMessageToClients(MessageObject{
 			ClientName: message.Name,
 			Message:    message.Message,
 		})
 	}
 }
 
-func broadcastMessage(message MessageObject) {
+func broadcastMessageToClients(message MessageObject) {
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
 

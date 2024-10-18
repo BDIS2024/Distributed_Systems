@@ -19,18 +19,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	defer conn.Close()
 
 	client := proto.NewChittyChatServiceClient(conn)
-
-	stream, err := client.ChatService(context.Background())
-	if err != nil {
-		log.Fatal(err.Error())
-	}
 
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("Enter your username")
-
 	username, err := reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err.Error())
@@ -38,9 +33,8 @@ func main() {
 	username = strings.TrimSpace(username)
 
 	for {
-		reader := bufio.NewReader(os.Stdin)
-
-		fmt.Println("type join to join a chat session, type exit to exit program")
+		fmt.Println("Type 'join' to join a chat session.")
+		fmt.Println("Type 'exit' to exit the program")
 
 		message, err := reader.ReadString('\n')
 		if err != nil {
@@ -50,6 +44,12 @@ func main() {
 
 		if message == "join" {
 			fmt.Println("Joining chat...")
+
+			stream, err := client.ChatService(context.Background())
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+
 			err = stream.Send(&proto.ClientMessage{
 				Name:      username,
 				Message:   "has joined the chat.",
@@ -59,48 +59,54 @@ func main() {
 				log.Println(err.Error())
 			}
 
-			waitc := make(chan struct{})
+			waitc := make(chan bool)
+			donec := make(chan bool)
 
-			go retrieveMessage(waitc, stream)
-			go sendMessage(waitc, stream, username)
+			go retrieveMessage(waitc, donec, stream)
+			go sendMessage(donec, stream, username)
 
 			<-waitc
-		}
-		if message == "exit" {
+		} else if message == "exit" {
+			fmt.Println("Exiting program...")
 			break
 		}
-
 	}
-
 }
 
-func retrieveMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
+func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient) {
 	for {
-		in, err := stream.Recv()
-		if err == io.EOF {
-			close(waitc)
+		select {
+		case <-donec:
+			waitc <- true
 			return
+		default:
+			in, err := stream.Recv()
+			if err == io.EOF {
+				waitc <- true
+				return
+			}
+			if err != nil {
+				log.Println("Error receiving message:", err)
+				waitc <- true
+				return
+			}
+			fmt.Printf("%s : %s (%s)\n", in.Name, in.Message, in.Timestamp)
 		}
-
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		fmt.Printf("%s : %s (%s)\n", in.Name, in.Message, in.Timestamp)
 	}
 }
 
-func sendMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient, username string) {
+func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string) {
+	reader := bufio.NewReader(os.Stdin)
 	for {
-		reader := bufio.NewReader(os.Stdin)
 		message, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
 			fmt.Println("Leaving chat...")
+
 			err = stream.Send(&proto.ClientMessage{
 				Name:      username,
 				Message:   "has left the chat.",
@@ -110,21 +116,22 @@ func sendMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatService
 				log.Println(err.Error())
 			}
 
-			close(waitc)
-
 			err = stream.CloseSend()
 			if err != nil {
-				log.Println(err.Error())
+				log.Println("Error closing stream:", err)
 			}
+
+			donec <- true
 			return
 		}
+
 		err = stream.Send(&proto.ClientMessage{
 			Name:      username,
 			Message:   message,
 			Timestamp: "1",
 		})
 		if err != nil {
-			log.Fatal(err.Error())
+			log.Println("Error sending message:", err)
 		}
 	}
 }

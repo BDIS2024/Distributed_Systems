@@ -49,11 +49,19 @@ func main() {
 		message = strings.TrimSpace(message)
 
 		if message == "join" {
-			fmt.Println("joined")
+			fmt.Println("Joining chat...")
+			err = stream.Send(&proto.ClientMessage{
+				Name:      username,
+				Message:   "has joined the chat.",
+				Timestamp: "1",
+			})
+			if err != nil {
+				log.Println(err.Error())
+			}
 
 			waitc := make(chan struct{})
 
-			go retrieveMessage(waitc, stream, username)
+			go retrieveMessage(waitc, stream)
 			go sendMessage(waitc, stream, username)
 
 			<-waitc
@@ -66,7 +74,7 @@ func main() {
 
 }
 
-func retrieveMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient, username string) {
+func retrieveMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient) {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -77,14 +85,13 @@ func retrieveMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatSer
 		if err != nil {
 			log.Fatal(err.Error())
 		}
-		fmt.Printf("user: %s message: %s timestamp: %s\n", username, in.Message, in.Timestamp)
+		fmt.Printf("%s : %s (%s)\n", in.Name, in.Message, in.Timestamp)
 	}
 }
 
 func sendMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatServiceClient, username string) {
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("enter message")
 		message, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err.Error())
@@ -93,13 +100,31 @@ func sendMessage(waitc chan struct{}, stream proto.ChittyChatService_ChatService
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			fmt.Println("!!!!!")
+			fmt.Println("Leaving chat...")
+			err = stream.Send(&proto.ClientMessage{
+				Name:      username,
+				Message:   "has left the chat.",
+				Timestamp: "1",
+			})
+			if err != nil {
+				log.Println(err.Error())
+			}
+
 			close(waitc)
+
+			err = stream.CloseSend()
+			if err != nil {
+				log.Println(err.Error())
+			}
 			return
 		}
-		stream.Send(&proto.ClientMessage{
+		err = stream.Send(&proto.ClientMessage{
 			Name:      username,
 			Message:   message,
-			Timestamp: "1"})
+			Timestamp: "1",
+		})
+		if err != nil {
+			log.Fatal(err.Error())
+		}
 	}
 }

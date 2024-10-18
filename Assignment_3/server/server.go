@@ -2,8 +2,8 @@ package main
 
 import (
 	proto "Assignment_3/proto"
+	"io"
 	"log"
-	"math/rand"
 	"net"
 	"sync"
 
@@ -14,91 +14,89 @@ type ChittyChatServer struct {
 	proto.UnimplementedChittyChatServiceServer
 }
 
-type messageObject struct {
+type MessageObject struct {
 	ClientName string
 	Message    string
-	ClientID   int
-	MessageID  int
 }
 
-type messageHandler struct {
-	Messages []messageObject
-	Lock     sync.Mutex
+type MessageHandler struct {
+	Clients map[string]proto.ChittyChatService_ChatServiceServer
+	Lock    sync.Mutex
 }
 
-var handler = messageHandler{}
+var handler = MessageHandler{
+	Clients: make(map[string]proto.ChittyChatService_ChatServiceServer),
+}
 
 func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServiceServer) error {
-	clientID := rand.Intn(1e6)
-	errorchan := make(chan error)
+	errorChan := make(chan error)
 
-	go retrieveMessage(clientID, stream, errorchan)
-	go sendMessage(clientID, stream, errorchan)
+	go retrieveMessagesFromClient(stream, errorChan)
 
-	return <-errorchan
+	return <-errorChan
 }
 
-func retrieveMessage(clientID int, stream proto.ChittyChatService_ChatServiceServer, errorchan chan error) {
+func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer, errorChan chan error) {
+	clientName := ""
+
 	for {
 		message, err := stream.Recv()
-		if err != nil {
-			log.Print(err.Error())
-			errorchan <- err
+		if err == io.EOF {
+			removeClient(clientName)
+			errorChan <- err
+			return
 		}
-		messageID := rand.Intn(1e6)
+		if err != nil {
+			log.Printf("Error receiving message: %v", err)
+			removeClient(clientName)
+			errorChan <- err
+			return
+		}
 
-		handler.Lock.Lock()
-		handler.Messages = append(handler.Messages, messageObject{
+		if clientName == "" {
+			clientName = message.Name
+			addClient(clientName, stream)
+		}
+
+		broadcastMessage(MessageObject{
 			ClientName: message.Name,
 			Message:    message.Message,
-			ClientID:   clientID,
-			MessageID:  messageID,
 		})
-
-		handler.Lock.Unlock()
-
 	}
 }
 
-func sendMessage(clientID int, stream proto.ChittyChatService_ChatServiceServer, errorchan chan error) {
-	for {
-		for {
-			handler.Lock.Lock()
+func broadcastMessage(message MessageObject) {
+	handler.Lock.Lock()
+	defer handler.Lock.Unlock()
 
-			if len(handler.Messages) == 0 {
-				handler.Lock.Unlock()
-				break
-			}
+	for clientName, clientStream := range handler.Clients {
 
-			senderID := handler.Messages[0].ClientID
-			senderName := handler.Messages[0].ClientName
-			senderMessage := handler.Messages[0].Message
-
-			handler.Lock.Unlock()
-
-			if senderID != clientID {
-				err := stream.Send(&proto.ServerMessage{
-					Name:      senderName,
-					Message:   senderMessage,
-					Timestamp: "1",
-				})
-				if err != nil {
-					log.Println(err)
-					errorchan <- err
-				}
-
-				handler.Lock.Lock()
-
-				if len(handler.Messages) > 1 {
-					handler.Messages = handler.Messages[1:]
-				} else {
-					handler.Messages = []messageObject{}
-				}
-
-				handler.Lock.Unlock()
+		if clientName != message.ClientName {
+			err := clientStream.Send(&proto.ServerMessage{
+				Name:      message.ClientName,
+				Message:   message.Message,
+				Timestamp: "1",
+			})
+			if err != nil {
+				log.Printf("Error sending message to %s: %v", clientName, err)
+				removeClient(clientName)
 			}
 		}
 	}
+}
+
+func addClient(clientName string, client proto.ChittyChatService_ChatServiceServer) {
+	handler.Lock.Lock()
+	defer handler.Lock.Unlock()
+
+	handler.Clients[clientName] = client
+}
+
+func removeClient(clientName string) {
+	handler.Lock.Lock()
+	defer handler.Lock.Unlock()
+
+	delete(handler.Clients, clientName)
 }
 
 func main() {
@@ -107,11 +105,12 @@ func main() {
 
 	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal(err)
 	}
 
+	log.Println("Server started on :5050")
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatal(err.Error())
+		log.Fatal(err)
 	}
 }

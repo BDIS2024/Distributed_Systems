@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -45,18 +46,20 @@ func main() {
 		message = strings.TrimSpace(message)
 
 		if message == "join" {
-			fmt.Printf("%s has joined the chat. (%d)\n", username, counter)
+			consoleChannel := make(chan proto.ClientMessage) // channel for console.
 
 			stream, err := client.ChatService(context.Background())
 			if err != nil {
 				log.Fatal(err.Error())
 			}
 
-			err = stream.Send(&proto.ClientMessage{
+			msg := proto.ClientMessage{
 				Name:      username,
 				Message:   "has joined the chat.",
 				Timestamp: counter,
-			})
+			}
+
+			err = stream.Send(&msg)
 			if err != nil {
 				log.Println(err.Error())
 			}
@@ -64,8 +67,11 @@ func main() {
 			waitc := make(chan bool)
 			donec := make(chan bool)
 
-			go retrieveMessage(waitc, donec, stream)
-			go sendMessage(donec, stream, username)
+			go retrieveMessage(waitc, donec, stream, consoleChannel)
+			go sendMessage(donec, stream, username, consoleChannel)
+			go consoleManager(consoleChannel)
+
+			consoleChannel <- msg
 
 			<-waitc
 		} else if message == "exit" {
@@ -75,7 +81,54 @@ func main() {
 	}
 }
 
-func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient) {
+// https://stackoverflow.com/questions/22891644/how-can-i-clear-the-terminal-screen-in-go
+var clear map[string]func()
+
+func init() {
+	clear = make(map[string]func()) //Initialize it
+	clear["linux"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+}
+
+func CallClear() {
+	for i := 0; i < 30; i++ {
+		fmt.Println()
+	}
+}
+
+func consoleManager(consoleChannel chan proto.ClientMessage) {
+	messages := []proto.ClientMessage{}
+	for {
+
+		in := <-consoleChannel
+		messages = append(messages, in)
+		CallClear()
+
+		fmt.Println("--- Chitty-Chat ---")
+
+		i := 0
+		if len(messages) > 20 {
+			i = len(messages) - 20
+			fmt.Printf("<%d Previous messages>\n", i)
+		}
+
+		for ; i < len(messages); i++ {
+			msg := messages[i]
+			fmt.Printf("%s : %s (%d)\n", msg.Name, msg.Message, msg.Timestamp)
+		}
+	}
+
+}
+
+func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient, consoleChannel chan proto.ClientMessage) {
 	for {
 		select {
 		case <-donec:
@@ -93,12 +146,16 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 				return
 			}
 			counter = max(counter, in.Timestamp) + 1
-			fmt.Printf("%s : %s (%d)\n", in.Name, in.Message, counter)
+			consoleChannel <- proto.ClientMessage{
+				Name:      in.Name,
+				Message:   in.Message,
+				Timestamp: counter,
+			}
 		}
 	}
 }
 
-func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string) {
+func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string, consoleChannel chan proto.ClientMessage) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		message, err := reader.ReadString('\n')
@@ -128,11 +185,14 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			return
 		}
 		counter++
-		err = stream.Send(&proto.ClientMessage{
+
+		msg := proto.ClientMessage{
 			Name:      username,
 			Message:   message,
 			Timestamp: counter,
-		})
+		}
+		consoleChannel <- msg
+		err = stream.Send(&msg)
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}

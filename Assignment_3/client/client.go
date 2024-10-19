@@ -5,98 +5,203 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+var counter int32 = 0
+
 func main() {
 	conn, err := grpc.NewClient("localhost:5050", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	defer conn.Close()
 
 	client := proto.NewChittyChatServiceClient(conn)
 
+	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Println("Enter your username")
+	username, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	username = strings.TrimSpace(username)
+
 	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Print("enter command\n join to join a session\nquit to quit program\n")
-		command, err := reader.ReadString('\n')
+		fmt.Println("Type 'join' to join a chat session.")
+		fmt.Println("Type 'exit' to exit the program")
+
+		message, err := reader.ReadString('\n')
 		if err != nil {
-			log.Fatalf("failed to read")
+			log.Fatal(err.Error())
 		}
+		message = strings.TrimSpace(message)
 
-		command = strings.TrimSpace(command)
-		if command == "join" {
-			fmt.Println("joined")
-			for {
-				fmt.Print("enter command\n leave to leave\n send to send message\n get to get messages\n")
-				todo, erro := reader.ReadString('\n')
-				todo = strings.TrimSpace(todo)
-				if erro != nil {
-					log.Fatalf("failed to read")
-				}
+		if message == "join" {
+			consoleChannel := make(chan proto.ClientMessage) // channel for console.
 
-				if todo == "leave" {
-					fmt.Println("left")
-					break
-				}
-
-				if todo == "send" {
-					fmt.Println("enter message")
-					tosend, erro := reader.ReadString('\n')
-					if erro != nil {
-						log.Fatalf("failed to read")
-					}
-					tosend = strings.TrimSpace(tosend)
-					sendMessage(client, tosend)
-					getMessages(client)
-				}
-
-				if todo == "get" {
-					getMessages(client)
-				}
+			stream, err := client.ChatService(context.Background())
+			if err != nil {
+				log.Fatal(err.Error())
 			}
-		}
-		if command == "quit" {
+
+			msg := proto.ClientMessage{
+				Name:      username,
+				Message:   "has joined the chat.",
+				Timestamp: counter,
+			}
+
+			err = stream.Send(&msg)
+			if err != nil {
+				log.Println(err.Error())
+			}
+
+			waitc := make(chan bool)
+			donec := make(chan bool)
+
+			go retrieveMessage(waitc, donec, stream, consoleChannel)
+			go sendMessage(donec, stream, username, consoleChannel)
+			go consoleManager(consoleChannel)
+
+			consoleChannel <- msg
+
+			<-waitc
+		} else if message == "exit" {
+			fmt.Println("Exiting program...")
 			break
 		}
-
 	}
-	fmt.Println("done")
-	// setup cli with send message command, get messages command, join command, quit command,
-	// send messages takes 1 arg the messages to send
-	// get messages takes 0 args
-	// join takes 0 args
-	// quit take 0 args
+}
 
-	// *to send message
-	// call sendmessage with message arg
-	// client code will compute a lamport timestamp (nodenr, eventnr)
-	// pass message and timstamp into sendmessage remote function
-	// to compute nodenr when client joining send join request, server will compute an id for client, when new client joins compute another id and send back
+// https://stackoverflow.com/questions/22891644/how-can-i-clear-the-terminal-screen-in-go
+var clear map[string]func()
 
-	// this is not live chatting
-	// can use bi directional streaming*
+func init() {
+	clear = make(map[string]func()) //Initialize it
+	clear["linux"] = func() {
+		cmd := exec.Command("clear") //Linux example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+	clear["windows"] = func() {
+		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
+		cmd.Stdout = os.Stdout
+		cmd.Run()
+	}
+}
+
+func CallClear() {
+	for i := 0; i < 30; i++ {
+		fmt.Println()
+	}
+}
+
+func consoleManager(consoleChannel chan proto.ClientMessage) {
+	messages := []proto.ClientMessage{}
+	for {
+
+		in := <-consoleChannel
+		messages = append(messages, in)
+		CallClear()
+
+		fmt.Println("--- Chitty-Chat ---")
+
+		i := 0
+		if len(messages) > 20 {
+			i = len(messages) - 20
+			fmt.Printf("<%d Previous messages>\n", i)
+		}
+
+		for ; i < len(messages); i++ {
+			msg := messages[i]
+			fmt.Printf("%s : %s (%d)\n", msg.Name, msg.Message, msg.Timestamp)
+		}
+	}
 
 }
 
-func sendMessage(client proto.ChittyChatServiceClient, messag string) {
-	message, err := client.SendMessage(context.Background(), &proto.Message{Message: messag, Timestamp: 1})
-	if err != nil {
-		log.Fatal(err.Error())
+func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient, consoleChannel chan proto.ClientMessage) {
+	for {
+		select {
+		case <-donec:
+			waitc <- true
+			return
+		default:
+			in, err := stream.Recv()
+			if err == io.EOF {
+				waitc <- true
+				return
+			}
+			if err != nil {
+				log.Println("Error receiving message:", err)
+				waitc <- true
+				return
+			}
+			counter = max(counter, in.Timestamp) + 1
+			consoleChannel <- proto.ClientMessage{
+				Name:      in.Name,
+				Message:   in.Message,
+				Timestamp: counter,
+			}
+		}
 	}
-	log.Printf("Sent message: %s, with timestamp: %d\n", message.Message, message.Timestamp)
 }
 
-func getMessages(client proto.ChittyChatServiceClient) {
-	messages, err := client.GetMessages(context.Background(), &proto.Empty{})
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string, consoleChannel chan proto.ClientMessage) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		message, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		message = strings.TrimSpace(message)
 
-	fmt.Println(messages.Messages[len(messages.Messages)-1].Message)
+		if message == "leave" {
+			fmt.Printf("%s has left the chat. (%d)\n", username, counter)
+
+			err = stream.Send(&proto.ClientMessage{
+				Name:      username,
+				Message:   "has left the chat.",
+				Timestamp: counter,
+			})
+			if err != nil {
+				log.Println(err.Error())
+			}
+
+			err = stream.CloseSend()
+			if err != nil {
+				log.Println("Error closing stream:", err)
+			}
+
+			donec <- true
+			return
+		}
+		counter++
+
+		msg := proto.ClientMessage{
+			Name:      username,
+			Message:   message,
+			Timestamp: counter,
+		}
+		consoleChannel <- msg
+		err = stream.Send(&msg)
+		if err != nil {
+			log.Println("Error sending message:", err)
+		}
+	}
+}
+
+func max(counter int32, comparecounter int32) int32 {
+	if counter < comparecounter {
+		return comparecounter
+	}
+	return counter
 }

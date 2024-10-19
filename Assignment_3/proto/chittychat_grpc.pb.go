@@ -19,16 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChittyChatService_SendMessage_FullMethodName = "/ChittyChatService/SendMessage"
-	ChittyChatService_GetMessages_FullMethodName = "/ChittyChatService/GetMessages"
+	ChittyChatService_ChatService_FullMethodName = "/ChittyChatService/ChatService"
 )
 
 // ChittyChatServiceClient is the client API for ChittyChatService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChittyChatServiceClient interface {
-	SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
-	GetMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Messages, error)
+	ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ClientMessage, ServerMessage], error)
 }
 
 type chittyChatServiceClient struct {
@@ -39,32 +37,24 @@ func NewChittyChatServiceClient(cc grpc.ClientConnInterface) ChittyChatServiceCl
 	return &chittyChatServiceClient{cc}
 }
 
-func (c *chittyChatServiceClient) SendMessage(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
+func (c *chittyChatServiceClient) ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ClientMessage, ServerMessage], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Message)
-	err := c.cc.Invoke(ctx, ChittyChatService_SendMessage_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &ChittyChatService_ServiceDesc.Streams[0], ChittyChatService_ChatService_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[ClientMessage, ServerMessage]{ClientStream: stream}
+	return x, nil
 }
 
-func (c *chittyChatServiceClient) GetMessages(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Messages, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Messages)
-	err := c.cc.Invoke(ctx, ChittyChatService_GetMessages_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ChittyChatService_ChatServiceClient = grpc.BidiStreamingClient[ClientMessage, ServerMessage]
 
 // ChittyChatServiceServer is the server API for ChittyChatService service.
 // All implementations must embed UnimplementedChittyChatServiceServer
 // for forward compatibility.
 type ChittyChatServiceServer interface {
-	SendMessage(context.Context, *Message) (*Message, error)
-	GetMessages(context.Context, *Empty) (*Messages, error)
+	ChatService(grpc.BidiStreamingServer[ClientMessage, ServerMessage]) error
 	mustEmbedUnimplementedChittyChatServiceServer()
 }
 
@@ -75,11 +65,8 @@ type ChittyChatServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedChittyChatServiceServer struct{}
 
-func (UnimplementedChittyChatServiceServer) SendMessage(context.Context, *Message) (*Message, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
-}
-func (UnimplementedChittyChatServiceServer) GetMessages(context.Context, *Empty) (*Messages, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetMessages not implemented")
+func (UnimplementedChittyChatServiceServer) ChatService(grpc.BidiStreamingServer[ClientMessage, ServerMessage]) error {
+	return status.Errorf(codes.Unimplemented, "method ChatService not implemented")
 }
 func (UnimplementedChittyChatServiceServer) mustEmbedUnimplementedChittyChatServiceServer() {}
 func (UnimplementedChittyChatServiceServer) testEmbeddedByValue()                           {}
@@ -102,41 +89,12 @@ func RegisterChittyChatServiceServer(s grpc.ServiceRegistrar, srv ChittyChatServ
 	s.RegisterService(&ChittyChatService_ServiceDesc, srv)
 }
 
-func _ChittyChatService_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Message)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ChittyChatServiceServer).SendMessage(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ChittyChatService_SendMessage_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChittyChatServiceServer).SendMessage(ctx, req.(*Message))
-	}
-	return interceptor(ctx, in, info, handler)
+func _ChittyChatService_ChatService_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ChittyChatServiceServer).ChatService(&grpc.GenericServerStream[ClientMessage, ServerMessage]{ServerStream: stream})
 }
 
-func _ChittyChatService_GetMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ChittyChatServiceServer).GetMessages(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ChittyChatService_GetMessages_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ChittyChatServiceServer).GetMessages(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ChittyChatService_ChatServiceServer = grpc.BidiStreamingServer[ClientMessage, ServerMessage]
 
 // ChittyChatService_ServiceDesc is the grpc.ServiceDesc for ChittyChatService service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -144,16 +102,14 @@ func _ChittyChatService_GetMessages_Handler(srv interface{}, ctx context.Context
 var ChittyChatService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "ChittyChatService",
 	HandlerType: (*ChittyChatServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "SendMessage",
-			Handler:    _ChittyChatService_SendMessage_Handler,
-		},
-		{
-			MethodName: "GetMessages",
-			Handler:    _ChittyChatService_GetMessages_Handler,
+			StreamName:    "ChatService",
+			Handler:       _ChittyChatService_ChatService_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/chittychat.proto",
 }

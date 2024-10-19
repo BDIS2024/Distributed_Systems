@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+var counter int32 = 0
+
 func main() {
 	conn, err := grpc.NewClient("localhost:5050", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -43,7 +45,7 @@ func main() {
 		message = strings.TrimSpace(message)
 
 		if message == "join" {
-			fmt.Println("Joining chat...")
+			fmt.Printf("%s has joined the chat. (%d)\n", username, counter)
 
 			stream, err := client.ChatService(context.Background())
 			if err != nil {
@@ -53,7 +55,7 @@ func main() {
 			err = stream.Send(&proto.ClientMessage{
 				Name:      username,
 				Message:   "has joined the chat.",
-				Timestamp: "1",
+				Timestamp: counter,
 			})
 			if err != nil {
 				log.Println(err.Error())
@@ -90,7 +92,8 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 				waitc <- true
 				return
 			}
-			fmt.Printf("%s : %s (%s)\n", in.Name, in.Message, in.Timestamp)
+			counter = max(counter, in.Timestamp) + 1
+			fmt.Printf("%s : %s (%d)\n", in.Name, in.Message, counter)
 		}
 	}
 }
@@ -105,12 +108,12 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			fmt.Println("Leaving chat...")
+			fmt.Printf("%s has left the chat. (%d)\n", username, counter)
 
 			err = stream.Send(&proto.ClientMessage{
 				Name:      username,
 				Message:   "has left the chat.",
-				Timestamp: "1",
+				Timestamp: counter,
 			})
 			if err != nil {
 				log.Println(err.Error())
@@ -124,14 +127,21 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			donec <- true
 			return
 		}
-
+		counter++
 		err = stream.Send(&proto.ClientMessage{
 			Name:      username,
 			Message:   message,
-			Timestamp: "1",
+			Timestamp: counter,
 		})
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}
 	}
+}
+
+func max(counter int32, comparecounter int32) int32 {
+	if counter < comparecounter {
+		return comparecounter
+	}
+	return counter
 }

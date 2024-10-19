@@ -17,6 +17,7 @@ type ChittyChatServer struct {
 type MessageObject struct {
 	ClientName string
 	Message    string
+	Timestamp  int32
 }
 
 type MessageHandler struct {
@@ -27,6 +28,8 @@ type MessageHandler struct {
 var handler = MessageHandler{
 	Clients: make(map[string]proto.ChittyChatService_ChatServiceServer),
 }
+
+var counter int32 = 0
 
 func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServiceServer) error {
 	errorChan := make(chan error)
@@ -57,25 +60,21 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 			clientName = message.Name
 			addClient(clientName, stream)
 		}
-
-		broadcastMessageToClients(MessageObject{
-			ClientName: message.Name,
-			Message:    message.Message,
-		})
+		counter = max(counter, message.Timestamp) + 1
+		broadcastMessageToClients(message)
 	}
 }
 
-func broadcastMessageToClients(message MessageObject) {
+func broadcastMessageToClients(message *proto.ClientMessage) {
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
-
 	for clientName, clientStream := range handler.Clients {
 
-		if clientName != message.ClientName {
+		if clientName != message.Name {
 			err := clientStream.Send(&proto.ServerMessage{
-				Name:      message.ClientName,
+				Name:      message.Name,
 				Message:   message.Message,
-				Timestamp: "1",
+				Timestamp: counter,
 			})
 			if err != nil {
 				log.Printf("Error sending message to %s: %v", clientName, err)
@@ -113,4 +112,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func max(counter int32, comparecounter int32) int32 {
+	if counter < comparecounter {
+		return comparecounter
+	}
+	return counter
 }

@@ -66,6 +66,7 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 }
 
 func broadcastMessageToClients(message *proto.ClientMessage) {
+	counter++
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
 	for clientName, clientStream := range handler.Clients {

@@ -141,7 +141,6 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 				return
 			}
 			if err != nil {
-				log.Println("Error receiving message:", err)
 				waitc <- true
 				return
 			}

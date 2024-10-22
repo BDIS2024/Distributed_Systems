@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"sync"
 
 	"google.golang.org/grpc"
@@ -67,6 +68,7 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 		}
 
 		counter = max(counter, message.Timestamp) + 1
+		log.Printf("Server recieved request: Name: %s, Message: %s, Timestamp: (%d) at %d\n", message.Name, message.Message, message.Timestamp, counter)
 		broadcastMessageToClients(message)
 	}
 }
@@ -85,8 +87,8 @@ func broadcastMessageToClients(message *proto.ClientMessage) {
 			log.Printf("Error sending message to %s: %v", clientName, err)
 			removeClient(clientName)
 		}
-
 	}
+	log.Printf("Server sent response: Name: %s, Message: %s, Timestamp: (%d)\n", message.Name, message.Message, counter)
 }
 
 func sendErrorToCLient(clientName string, erro string) {
@@ -110,6 +112,8 @@ func addClient(clientName string, client proto.ChittyChatService_ChatServiceServ
 	defer handler.Lock.Unlock()
 
 	handler.Clients[clientName] = client
+	counter++
+	log.Printf("Server added client: %s, (%d)\n", clientName, counter)
 }
 
 func removeClient(clientName string) {
@@ -117,9 +121,19 @@ func removeClient(clientName string) {
 	defer handler.Lock.Unlock()
 
 	delete(handler.Clients, clientName)
+	counter++
+	log.Printf("Server removed client: %s, (%d)\n", clientName, counter)
 }
 
 func main() {
+	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	grpcServer := grpc.NewServer()
 	proto.RegisterChittyChatServiceServer(grpcServer, &ChittyChatServer{})
 

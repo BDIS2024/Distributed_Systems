@@ -1,0 +1,174 @@
+2024/10/22 12:47:46 Server started on :5050
+2024/10/22 12:47:50 Server added client: 1, (1)
+2024/10/22 12:47:50 Server recieved request: Name: 1, Message: has joined the chat., Timestamp: (0) at 2
+2024/10/22 12:47:50 Server sent response: Name: 1, Message: has joined the chat., Timestamp: (3)
+2024/10/22 12:47:50 Client recieved response: Name: 1, Message: has joined the chat., Timestamp: (3) at: 4
+2024/10/22 12:47:51 Client sent request: Name: 1, Message: q, Timestamp: (5)
+2024/10/22 12:47:51 Server recieved request: Name: 1, Message: q, Timestamp: (5) at 6
+2024/10/22 12:47:51 Server sent response: Name: 1, Message: q, Timestamp: (7)
+2024/10/22 12:47:51 Client recieved response: Name: 1, Message: q, Timestamp: (7) at: 8
+2024/10/22 12:47:51 Client sent request: Name: 1, Message: q, Timestamp: (9)
+2024/10/22 12:47:51 Server recieved request: Name: 1, Message: q, Timestamp: (9) at 10
+2024/10/22 12:47:51 Server sent response: Name: 1, Message: q, Timestamp: (11)
+2024/10/22 12:47:51 Client recieved response: Name: 1, Message: q, Timestamp: (11) at: 12
+2024/10/22 12:47:51 Client sent request: Name: 1, Message: q, Timestamp: (13)
+2024/10/22 12:47:51 Server recieved request: Name: 1, Message: q, Timestamp: (13) at 14
+2024/10/22 12:47:51 Server sent response: Name: 1, Message: q, Timestamp: (15)
+2024/10/22 12:47:51 Client recieved response: Name: 1, Message: q, Timestamp: (15) at: 16
+2024/10/22 12:47:51 Client sent request: Name: 1, Message: q, Timestamp: (17)
+2024/10/22 12:47:51 Server recieved request: Name: 1, Message: q, Timestamp: (17) at 18
+2024/10/22 12:47:51 Server sent response: Name: 1, Message: q, Timestamp: (19)
+2024/10/22 12:47:51 Client recieved response: Name: 1, Message: q, Timestamp: (19) at: 20
+2024/10/22 12:47:51 Client sent request: Name: 1, Message: q, Timestamp: (21)
+2024/10/22 12:47:51 Server recieved request: Name: 1, Message: q, Timestamp: (21) at 22
+2024/10/22 12:47:51 Server sent response: Name: 1, Message: q, Timestamp: (23)
+2024/10/22 12:47:51 Client recieved response: Name: 1, Message: q, Timestamp: (23) at: 24
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: , Timestamp: (25)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: , Timestamp: (25) at 26
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: , Timestamp: (27)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: , Timestamp: (27) at: 28
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: qq, Timestamp: (29)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: qq, Timestamp: (29) at 30
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: qq, Timestamp: (31)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: qq, Timestamp: (31) at: 32
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: , Timestamp: (33)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: , Timestamp: (33) at 34
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: , Timestamp: (35)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: , Timestamp: (35) at: 36
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: q, Timestamp: (37)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: q, Timestamp: (37) at 38
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: q, Timestamp: (39)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: q, Timestamp: (39) at: 40
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: q, Timestamp: (41)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: q, Timestamp: (41) at 42
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: q, Timestamp: (43)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: q, Timestamp: (43) at: 44
+2024/10/22 12:47:52 Client sent request: Name: 1, Message: q, Timestamp: (45)
+2024/10/22 12:47:52 Server recieved request: Name: 1, Message: q, Timestamp: (45) at 46
+2024/10/22 12:47:52 Server sent response: Name: 1, Message: q, Timestamp: (47)
+2024/10/22 12:47:52 Client recieved response: Name: 1, Message: q, Timestamp: (47) at: 48
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (49)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (49) at 50
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (51)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (51) at: 52
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (53)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (53) at 54
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (55)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (55) at: 56
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (57)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (57) at 58
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (59)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (59) at: 60
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (61)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (61) at 62
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (63)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (63) at: 64
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (65)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (65) at 66
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (67)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (67) at: 68
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: q, Timestamp: (69)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: q, Timestamp: (69) at 70
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: q, Timestamp: (71)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: q, Timestamp: (71) at: 72
+2024/10/22 12:47:53 Client sent request: Name: 1, Message: qw, Timestamp: (73)
+2024/10/22 12:47:53 Server recieved request: Name: 1, Message: qw, Timestamp: (73) at 74
+2024/10/22 12:47:53 Server sent response: Name: 1, Message: qw, Timestamp: (75)
+2024/10/22 12:47:53 Client recieved response: Name: 1, Message: qw, Timestamp: (75) at: 76
+2024/10/22 12:47:54 Client sent request: Name: 1, Message: eqwe, Timestamp: (77)
+2024/10/22 12:47:54 Server recieved request: Name: 1, Message: eqwe, Timestamp: (77) at 78
+2024/10/22 12:47:54 Server sent response: Name: 1, Message: eqwe, Timestamp: (79)
+2024/10/22 12:47:54 Client recieved response: Name: 1, Message: eqwe, Timestamp: (79) at: 80
+2024/10/22 12:47:54 Client sent request: Name: 1, Message: qwe, Timestamp: (81)
+2024/10/22 12:47:54 Server recieved request: Name: 1, Message: qwe, Timestamp: (81) at 82
+2024/10/22 12:47:54 Server sent response: Name: 1, Message: qwe, Timestamp: (83)
+2024/10/22 12:47:54 Client recieved response: Name: 1, Message: qwe, Timestamp: (83) at: 84
+2024/10/22 12:47:54 Client sent request: Name: 1, Message: qwpe, Timestamp: (85)
+2024/10/22 12:47:54 Server recieved request: Name: 1, Message: qwpe, Timestamp: (85) at 86
+2024/10/22 12:47:54 Server sent response: Name: 1, Message: qwpe, Timestamp: (87)
+2024/10/22 12:47:54 Client recieved response: Name: 1, Message: qwpe, Timestamp: (87) at: 88
+2024/10/22 12:47:54 Client sent request: Name: 1, Message: qpw, Timestamp: (89)
+2024/10/22 12:47:54 Server recieved request: Name: 1, Message: qpw, Timestamp: (89) at 90
+2024/10/22 12:47:54 Server sent response: Name: 1, Message: qpw, Timestamp: (91)
+2024/10/22 12:47:54 Client recieved response: Name: 1, Message: qpw, Timestamp: (91) at: 92
+2024/10/22 12:47:55 Client sent request: Name: 1, Message: e, Timestamp: (93)
+2024/10/22 12:47:55 Server recieved request: Name: 1, Message: e, Timestamp: (93) at 94
+2024/10/22 12:47:55 Server sent response: Name: 1, Message: e, Timestamp: (95)
+2024/10/22 12:47:55 Client recieved response: Name: 1, Message: e, Timestamp: (95) at: 96
+2024/10/22 12:49:06 Server added client: 2, (96)
+2024/10/22 12:49:06 Server recieved request: Name: 2, Message: has joined the chat., Timestamp: (0) at 97
+2024/10/22 12:49:06 Server sent response: Name: 2, Message: has joined the chat., Timestamp: (98)
+2024/10/22 12:49:06 Client recieved response: Name: 2, Message: has joined the chat., Timestamp: (98) at: 99
+2024/10/22 12:49:06 Client recieved response: Name: 2, Message: has joined the chat., Timestamp: (98) at: 99
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: q, Timestamp: (100)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: q, Timestamp: (100) at 101
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: q, Timestamp: (102)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (102) at: 103
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (102) at: 103
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: q, Timestamp: (104)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: q, Timestamp: (104) at 105
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: q, Timestamp: (106)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (106) at: 107
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (106) at: 107
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: q, Timestamp: (108)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: q, Timestamp: (108) at 109
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: q, Timestamp: (110)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (110) at: 111
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (110) at: 111
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: q, Timestamp: (112)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: q, Timestamp: (112) at 113
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: q, Timestamp: (114)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (114) at: 115
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (114) at: 115
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: q, Timestamp: (116)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: q, Timestamp: (116) at 117
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: q, Timestamp: (118)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (118) at: 119
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: q, Timestamp: (118) at: 119
+2024/10/22 12:49:08 Client sent request: Name: 2, Message: qq, Timestamp: (120)
+2024/10/22 12:49:08 Server recieved request: Name: 2, Message: qq, Timestamp: (120) at 121
+2024/10/22 12:49:08 Server sent response: Name: 2, Message: qq, Timestamp: (122)
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: qq, Timestamp: (122) at: 123
+2024/10/22 12:49:08 Client recieved response: Name: 2, Message: qq, Timestamp: (122) at: 123
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (124)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (124) at 125
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (126)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (126) at: 127
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (126) at: 127
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (128)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (128) at 129
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (130)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (130) at: 131
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (130) at: 131
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (132)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (132) at 133
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (134)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (134) at: 135
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (134) at: 135
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (136)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (136) at 137
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (138)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (138) at: 139
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (138) at: 139
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (140)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (140) at 141
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (142)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (142) at: 143
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (142) at: 143
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (144)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (144) at 145
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (146)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (146) at: 147
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (146) at: 147
+2024/10/22 12:49:09 Client sent request: Name: 2, Message: q, Timestamp: (148)
+2024/10/22 12:49:09 Server recieved request: Name: 2, Message: q, Timestamp: (148) at 149
+2024/10/22 12:49:09 Server sent response: Name: 2, Message: q, Timestamp: (150)
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (150) at: 151
+2024/10/22 12:49:09 Client recieved response: Name: 2, Message: q, Timestamp: (150) at: 151
+2024/10/22 12:49:10 Client sent request: Name: 2, Message: , Timestamp: (152)
+2024/10/22 12:49:10 Server recieved request: Name: 2, Message: , Timestamp: (152) at 153
+2024/10/22 12:49:10 Server sent response: Name: 2, Message: , Timestamp: (154)
+2024/10/22 12:49:10 Client recieved response: Name: 2, Message: , Timestamp: (154) at: 155
+2024/10/22 12:49:10 Client recieved response: Name: 2, Message: , Timestamp: (154) at: 155
+2024/10/22 13:02:21 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF
+2024/10/22 13:02:21 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF

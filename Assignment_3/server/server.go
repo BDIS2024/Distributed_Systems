@@ -60,6 +60,12 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 			clientName = message.Name
 			addClient(clientName, stream)
 		}
+
+		if len(message.Message) > 128 {
+			sendErrorToCLient(clientName, "Message has to be under 128 characters.")
+			continue
+		}
+
 		counter = max(counter, message.Timestamp) + 1
 		broadcastMessageToClients(message)
 	}
@@ -79,6 +85,22 @@ func broadcastMessageToClients(message *proto.ClientMessage) {
 			log.Printf("Error sending message to %s: %v", clientName, err)
 			removeClient(clientName)
 		}
+
+	}
+}
+
+func sendErrorToCLient(clientName string, erro string) {
+	handler.Lock.Lock()
+	defer handler.Lock.Unlock()
+	counter++
+
+	err := handler.Clients[clientName].Send(&proto.ServerMessage{
+		Name:      "Server",
+		Message:   erro,
+		Timestamp: counter,
+	})
+	if err != nil {
+		log.Printf("Error sending message to %s: %v", clientName, err)
 
 	}
 }

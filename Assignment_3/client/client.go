@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -68,33 +67,14 @@ func main() {
 			donec := make(chan bool)
 
 			go retrieveMessage(waitc, donec, stream, consoleChannel)
-			go sendMessage(donec, stream, username, consoleChannel)
+			go sendMessage(donec, stream, username)
 			go consoleManager(consoleChannel)
-
-			consoleChannel <- msg
 
 			<-waitc
 		} else if message == "exit" {
 			fmt.Println("Exiting program...")
 			break
 		}
-	}
-}
-
-// https://stackoverflow.com/questions/22891644/how-can-i-clear-the-terminal-screen-in-go
-var clear map[string]func()
-
-func init() {
-	clear = make(map[string]func()) //Initialize it
-	clear["linux"] = func() {
-		cmd := exec.Command("clear") //Linux example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-	clear["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
 	}
 }
 
@@ -107,7 +87,6 @@ func CallClear() {
 func consoleManager(consoleChannel chan proto.ClientMessage) {
 	messages := []proto.ClientMessage{}
 	for {
-
 		in := <-consoleChannel
 		messages = append(messages, in)
 		CallClear()
@@ -125,7 +104,6 @@ func consoleManager(consoleChannel chan proto.ClientMessage) {
 			fmt.Printf("%s : %s (%d)\n", msg.Name, msg.Message, msg.Timestamp)
 		}
 	}
-
 }
 
 func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient, consoleChannel chan proto.ClientMessage) {
@@ -155,7 +133,7 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 	}
 }
 
-func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string, consoleChannel chan proto.ClientMessage) {
+func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		message, err := reader.ReadString('\n')
@@ -175,7 +153,6 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			if err != nil {
 				log.Println(err.Error())
 			}
-
 			err = stream.CloseSend()
 			if err != nil {
 				log.Println("Error closing stream:", err)
@@ -192,7 +169,6 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			Timestamp: counter,
 		}
 		err = stream.Send(&msg)
-		//consoleChannel <- msg
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}

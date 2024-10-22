@@ -191,8 +191,8 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			Message:   message,
 			Timestamp: counter,
 		}
-		consoleChannel <- msg
 		err = stream.Send(&msg)
+		//consoleChannel <- msg
 		if err != nil {
 			log.Println("Error sending message:", err)
 		}

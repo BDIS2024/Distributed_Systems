@@ -71,6 +71,7 @@ func main() {
 				log.Fatal(err.Error())
 			}
 
+			log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
 			waitc := make(chan bool)
 			donec := make(chan bool)
 

@@ -8,7 +8,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"os/exec"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -18,6 +17,14 @@ import (
 var counter int32 = 0
 
 func main() {
+	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+
+	log.SetOutput(f)
+
 	conn, err := grpc.NewClient("localhost:5050", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err.Error())
@@ -61,7 +68,7 @@ func main() {
 
 			err = stream.Send(&msg)
 			if err != nil {
-				log.Println(err.Error())
+				log.Fatal(err.Error())
 			}
 
 			waitc := make(chan bool)
@@ -71,30 +78,11 @@ func main() {
 			go sendMessage(donec, stream, username, consoleChannel)
 			go consoleManager(consoleChannel)
 
-			consoleChannel <- msg
-
 			<-waitc
 		} else if message == "exit" {
 			fmt.Println("Exiting program...")
 			break
 		}
-	}
-}
-
-// https://stackoverflow.com/questions/22891644/how-can-i-clear-the-terminal-screen-in-go
-var clear map[string]func()
-
-func init() {
-	clear = make(map[string]func()) //Initialize it
-	clear["linux"] = func() {
-		cmd := exec.Command("clear") //Linux example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
-	}
-	clear["windows"] = func() {
-		cmd := exec.Command("cmd", "/c", "cls") //Windows example, its tested
-		cmd.Stdout = os.Stdout
-		cmd.Run()
 	}
 }
 
@@ -141,7 +129,7 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 				return
 			}
 			if err != nil {
-				log.Println("Error receiving message:", err)
+				log.Fatal("Error receiving message:", err)
 				waitc <- true
 				return
 			}
@@ -151,6 +139,7 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 				Message:   in.Message,
 				Timestamp: counter,
 			}
+			log.Printf("Client recieved response: Name: %s, Message: %s, Timestamp: (%d) at: %d\n", in.Name, in.Message, in.Timestamp, counter)
 		}
 	}
 }
@@ -165,20 +154,18 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			fmt.Printf("%s has left the chat. (%d)\n", username, counter)
-
 			err = stream.Send(&proto.ClientMessage{
 				Name:      username,
 				Message:   "has left the chat.",
 				Timestamp: counter,
 			})
 			if err != nil {
-				log.Println(err.Error())
+				log.Fatal(err.Error())
 			}
 
 			err = stream.CloseSend()
 			if err != nil {
-				log.Println("Error closing stream:", err)
+				log.Fatal("Error closing stream:", err)
 			}
 
 			donec <- true
@@ -192,10 +179,10 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 			Timestamp: counter,
 		}
 		err = stream.Send(&msg)
-		//consoleChannel <- msg
 		if err != nil {
-			log.Println("Error sending message:", err)
+			log.Fatal("Error sending message:", err)
 		}
+		log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
 	}
 }
 

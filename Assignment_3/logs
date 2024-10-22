@@ -170,5 +170,3 @@
 2024/10/22 12:49:10 Server sent response: Name: 2, Message: , Timestamp: (154)
 2024/10/22 12:49:10 Client recieved response: Name: 2, Message: , Timestamp: (154) at: 155
 2024/10/22 12:49:10 Client recieved response: Name: 2, Message: , Timestamp: (154) at: 155
-2024/10/22 13:02:21 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF
-2024/10/22 13:02:21 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF

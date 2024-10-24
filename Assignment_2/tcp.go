@@ -13,18 +13,6 @@ package main
 
 */
 
-/*
-Hi, after consulting with Emil, i sadly cannot approve your submission for the following reasons:
-
-- You seem to be confusing your syn and ack numbers, and incrementing them both simultaneusly (remember that the ack(-knowledgement) number should be the recieved syn number + 1)
-
-- Your server thread is receiving its syn number from the client instead of generating it itself.
-
-- Your ack number is hardcoded in the server. As mentioned above, it should be based on the recieved syn number.
-
-Please fix these issues and resubmit
-*/
-
 import (
 	"fmt"
 	"math/rand/v2"

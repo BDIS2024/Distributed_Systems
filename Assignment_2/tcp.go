@@ -1,19 +1,46 @@
 package main
 
+/*
+
+	Authored by: Markus Sværke Staael 	(msvs@itu.dk)
+	Authored by: Patrick Shen			(pash@itu.dk)
+	Authored by: Nicky Chengde Ye		(niye@itu.dk)
+
+	This sollution is a demonstration of a TCP handshake.
+	In this "world" we assume there is only one client and server that will communicate with each other.
+	The client or server will not retry if any errors occur (there will not occur errors) but will check for them to demonstrate knowledge of what is going to happen.
+	The client or server will not have timeouts for sending and recieving messages.
+
+*/
+
+/*
+Hi, after consulting with Emil, i sadly cannot approve your submission for the following reasons:
+
+- You seem to be confusing your syn and ack numbers, and incrementing them both simultaneusly (remember that the ack(-knowledgement) number should be the recieved syn number + 1)
+
+- Your server thread is receiving its syn number from the client instead of generating it itself.
+
+- Your ack number is hardcoded in the server. As mentioned above, it should be based on the recieved syn number.
+
+Please fix these issues and resubmit
+*/
+
 import (
 	"fmt"
+	"math/rand/v2"
 	"time"
 )
 
-type TCPPackage struct {
-	message string
-	seq     int
-	ack     int
+type TCPHeader struct {
+	sequence_number       int
+	acknowledgment_number int
+	ACK                   bool
+	SYN                   bool
 }
 
 type ChanSetup struct {
-	in  chan TCPPackage
-	out chan TCPPackage
+	in  chan TCPHeader
+	out chan TCPHeader
 }
 
 func hasMessage(channel ChanSetup) bool {
@@ -21,83 +48,105 @@ func hasMessage(channel ChanSetup) bool {
 }
 
 func main() {
-	channel1 := make(chan TCPPackage)
-	channel2 := make(chan TCPPackage)
-	done := make(chan int)
+	channel1 := make(chan TCPHeader)
+	channel2 := make(chan TCPHeader)
 
 	go client(ChanSetup{channel1, channel2})
-	go server(ChanSetup{channel2, channel1}, done)
-	fmt.Printf("%s - Client and server spawned\n", time.Now().Format(time.StampNano))
+	go server(ChanSetup{channel2, channel1})
 
-	<-done
+	for {
+	}
 }
 
-// Client methods
-
+// CLIENT
 func client(channel ChanSetup) {
-	var pack = TCPPackage{"request", 0, 0}
-	clientSendSYN(channel, pack)
-	if clientRecieveSYN(channel, &pack) { // if this method fails we end the handshake (and maybe try again)
+	fmt.Printf("%s - Client routine started.\n", time.Now().Format(time.StampNano))
+
+	//
+	// STEP 1: Create our first connection request.
+	//
+
+	var client_ISN = rand.IntN(100)
+	var syn_package = TCPHeader{
+		sequence_number:       client_ISN, // Client random sequence number
+		acknowledgment_number: 0,
+		ACK:                   false,
+		SYN:                   true, // We want to estabish connection
+	}
+	channel.out <- syn_package
+	fmt.Printf("%s - Client sent SYN package: %v\n", time.Now().Format(time.StampNano), syn_package)
+
+	//
+	// STEP 3: Recieve the SYN-ACK from the server
+	//
+
+	SYN_ACK_message_recieve := <-channel.in
+	fmt.Printf("%s - Client recieved SYN-ACK package: %v\n", time.Now().Format(time.StampNano), SYN_ACK_message_recieve)
+
+	// STEP 3.1: Check if all the recieved data is correct
+
+	if !(SYN_ACK_message_recieve.SYN == true) && // Assert that SYN flag is true
+		!(SYN_ACK_message_recieve.ACK == true) && // Assert that ACK flag is true
+		!(SYN_ACK_message_recieve.acknowledgment_number == client_ISN+1) { // Assert that acknowledgement number is as expected
+		clientEndDemonstration()
+		return
+	}
+	var server_ISN = SYN_ACK_message_recieve.sequence_number
+
+	// STEP 3.2 return ACK package
+	var ack_package = TCPHeader{
+		sequence_number:       client_ISN + 1, // Client random sequence number
+		acknowledgment_number: server_ISN + 1,
+		ACK:                   true,
+		SYN:                   false, // We want to estabish connection
+	}
+
+	fmt.Printf("%s - Client sent ACK package: %v\n", time.Now().Format(time.StampNano), ack_package)
+
+	// Connection has been established
+}
+
+// SERVER
+func server(channel ChanSetup) {
+	fmt.Printf("%s - Server listening.\n", time.Now().Format(time.StampNano))
+
+	//
+	// STEP 2: RECIEVE SYN and sent SYN-ACK
+	//
+
+	SYN_message_recieve := <-channel.in
+	fmt.Printf("%s - Server retrieved package: %v\n", time.Now().Format(time.StampNano), SYN_message_recieve)
+
+	// 2.1 Test to see if client want to establish connection (the expected message for this simple demonstration)
+	if SYN_message_recieve.SYN == false {
+		serverEndDemonstration(SYN_message_recieve)
 		return
 	}
 
-	clientSendACK(channel, pack)
-}
-
-func clientSendSYN(channel ChanSetup, pack TCPPackage) { // We send SYN
-	channel.out <- pack
-
-	fmt.Printf("%s - Client sent SYN package: %v\n", time.Now().Format(time.StampNano), pack)
-}
-
-func clientRecieveSYN(channel ChanSetup, pack *TCPPackage) bool {
-	var expectedAck = pack.seq + 1
-	var failure = true
-
-	select {
-	case <-time.After(5 * time.Second): // Timeout after 5 seconds
-		fmt.Printf("%s - Client timed out expecting package.\n", time.Now().Format(time.StampNano))
-
-	case message := <-channel.in: // We recieve message
-		if message.ack != expectedAck { // test if ack nr doesnt fit
-			fmt.Printf("%s - Client recieved message with wrong ack nr. Expected: %d Recieved: %d\n", time.Now().String(), expectedAck, message.ack)
-		} else {
-			fmt.Printf("%s - Client recieved message: %v\n", time.Now().Format(time.StampNano), message)
-			failure = false
-		}
+	// 2.2 Create a the returning SYN-ACK message
+	var server_ISN = rand.IntN(100)                      // The servers Sequence number
+	var client_ISN = SYN_message_recieve.sequence_number // The client sequence number (what sequence number we expect from them)
+	var syn_ack_package = TCPHeader{
+		sequence_number:       server_ISN,
+		acknowledgment_number: client_ISN + 1,
+		ACK:                   true, // We aknowledge your sequence number
+		SYN:                   true, // We also want to estabish connection
 	}
-	return failure
+
+	// 2.3 Return a reply
+	channel.out <- syn_ack_package
+	fmt.Printf("%s - Server sent back SYN-ACK response: %v\n", time.Now().Format(time.StampNano), syn_ack_package)
+
+	//
+	// (Any steps from here will not be demonstrated)
+	//
+	<-channel.in
 }
 
-func clientSendACK(channel ChanSetup, pack TCPPackage) {
-	pack.ack = pack.seq + 1
-
-	channel.out <- pack
-
-	fmt.Printf("%s - Client sent ACK package: %v\n", time.Now().Format(time.StampNano), pack)
+func clientEndDemonstration() {
+	fmt.Printf("%s - Client recieved unexpected package terminating demonstration.\n", time.Now().Format(time.StampNano))
 }
 
-// Server methods
-
-func server(channel ChanSetup, done chan int) {
-	message := <-channel.in
-	fmt.Printf("%s - Server retrieved package with sequence: %d\n", time.Now().Format(time.StampNano), message.seq)
-	message.seq += 1
-	message.ack = 1
-
-	channel.out <- message
-	fmt.Printf("%s - Server sent back response with seq: %d and ack: %d\n", time.Now().Format(time.StampNano), message.seq, message.ack)
-
-	response := <-channel.in
-	if response.seq == 1 {
-		channel.out <- response
-	} else {
-		fmt.Printf("%s - Server retrieved with sequence: %d, ack: %d and message: %s\n", time.Now().Format(time.StampNano), response.seq, response.ack, response.message)
-	}
-	done <- 1
+func serverEndDemonstration(arg TCPHeader) {
+	fmt.Printf("%s - Server recieved unexpected package (NO SYN FLAG) terminating demonstration.\n", time.Now().Format(time.StampNano))
 }
-
-/*
-1)[Easy] Implement the TCP/IP Handshake using threads. This is not realistic (since the protocol should run across a network)
-but your implementation needs to show that you have a good understanding of the protocol.
-*/

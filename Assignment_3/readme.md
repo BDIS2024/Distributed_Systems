@@ -6,6 +6,3 @@ The client program will prompt for you to input a client name.
 After you have inputted the preferred name then use command "join" to join the chat session.
 To leave the chat sesssion use the command "leave".
 To exit the program use the command "exit" or ctrl+c.
-
-
-https://docs.google.com/document/d/1Up1v9kepGLiWBEwYE3nzxZ93Q6Nsumn5RhEGw6rkq08/

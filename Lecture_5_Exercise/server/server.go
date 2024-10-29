@@ -1,7 +1,7 @@
 package main
 
 import (
-	pb "Lecture_5/proto"
+	pb "Lecture_5_Exercise/proto"
 	"context"
 	"log"
 	"net"

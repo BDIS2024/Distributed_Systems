@@ -1,0 +1,13 @@
+syntax='proto3';
+
+option go_package = 'Assignment_4/proto';
+
+message req{
+    string name = 1;
+    int32 timestamp = 2;
+}
+
+message rep{
+    string name = 1;
+    int32 timestamp = 
+}

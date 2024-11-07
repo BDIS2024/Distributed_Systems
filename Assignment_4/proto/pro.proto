@@ -7,7 +7,21 @@ message req{
     int32 timestamp = 2;
 }
 
+<<<<<<< HEAD
 message rep{
     string name = 1;
     int32 timestamp = 
 }
+=======
+message resp{
+    string name = 1;
+    int32 timestamp = 2;
+}
+
+service DMutexService{
+	rpc DistribuedMutexService (req) returns (resp){}
+}
+// to compile
+// cd to root directory (Assignment_4)
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/pro.proto
+>>>>>>> 3e8fcf5 (real stuff)

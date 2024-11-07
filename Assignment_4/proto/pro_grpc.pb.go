@@ -19,101 +19,139 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	DMutexService_DistribuedMutexService_FullMethodName = "/DMutexService/DistribuedMutexService"
+	MutualExclusion_RequestAccess_FullMethodName = "/MutualExclusion/RequestAccess"
+	MutualExclusion_Release_FullMethodName       = "/MutualExclusion/Release"
 )
 
-// DMutexServiceClient is the client API for DMutexService service.
+// MutualExclusionClient is the client API for MutualExclusion service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type DMutexServiceClient interface {
-	DistribuedMutexService(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Resp, error)
+type MutualExclusionClient interface {
+	RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
+	Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*Ack, error)
 }
 
-type dMutexServiceClient struct {
+type mutualExclusionClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDMutexServiceClient(cc grpc.ClientConnInterface) DMutexServiceClient {
-	return &dMutexServiceClient{cc}
+func NewMutualExclusionClient(cc grpc.ClientConnInterface) MutualExclusionClient {
+	return &mutualExclusionClient{cc}
 }
 
-func (c *dMutexServiceClient) DistribuedMutexService(ctx context.Context, in *Req, opts ...grpc.CallOption) (*Resp, error) {
+func (c *mutualExclusionClient) RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Resp)
-	err := c.cc.Invoke(ctx, DMutexService_DistribuedMutexService_FullMethodName, in, out, cOpts...)
+	out := new(Reply)
+	err := c.cc.Invoke(ctx, MutualExclusion_RequestAccess_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DMutexServiceServer is the server API for DMutexService service.
-// All implementations must embed UnimplementedDMutexServiceServer
-// for forward compatibility.
-type DMutexServiceServer interface {
-	DistribuedMutexService(context.Context, *Req) (*Resp, error)
-	mustEmbedUnimplementedDMutexServiceServer()
+func (c *mutualExclusionClient) Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*Ack, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Ack)
+	err := c.cc.Invoke(ctx, MutualExclusion_Release_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedDMutexServiceServer must be embedded to have
+// MutualExclusionServer is the server API for MutualExclusion service.
+// All implementations must embed UnimplementedMutualExclusionServer
+// for forward compatibility.
+type MutualExclusionServer interface {
+	RequestAccess(context.Context, *Request) (*Reply, error)
+	Release(context.Context, *ReleaseRequest) (*Ack, error)
+	mustEmbedUnimplementedMutualExclusionServer()
+}
+
+// UnimplementedMutualExclusionServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedDMutexServiceServer struct{}
+type UnimplementedMutualExclusionServer struct{}
 
-func (UnimplementedDMutexServiceServer) DistribuedMutexService(context.Context, *Req) (*Resp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DistribuedMutexService not implemented")
+func (UnimplementedMutualExclusionServer) RequestAccess(context.Context, *Request) (*Reply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RequestAccess not implemented")
 }
-func (UnimplementedDMutexServiceServer) mustEmbedUnimplementedDMutexServiceServer() {}
-func (UnimplementedDMutexServiceServer) testEmbeddedByValue()                       {}
+func (UnimplementedMutualExclusionServer) Release(context.Context, *ReleaseRequest) (*Ack, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Release not implemented")
+}
+func (UnimplementedMutualExclusionServer) mustEmbedUnimplementedMutualExclusionServer() {}
+func (UnimplementedMutualExclusionServer) testEmbeddedByValue()                         {}
 
-// UnsafeDMutexServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DMutexServiceServer will
+// UnsafeMutualExclusionServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to MutualExclusionServer will
 // result in compilation errors.
-type UnsafeDMutexServiceServer interface {
-	mustEmbedUnimplementedDMutexServiceServer()
+type UnsafeMutualExclusionServer interface {
+	mustEmbedUnimplementedMutualExclusionServer()
 }
 
-func RegisterDMutexServiceServer(s grpc.ServiceRegistrar, srv DMutexServiceServer) {
-	// If the following call pancis, it indicates UnimplementedDMutexServiceServer was
+func RegisterMutualExclusionServer(s grpc.ServiceRegistrar, srv MutualExclusionServer) {
+	// If the following call pancis, it indicates UnimplementedMutualExclusionServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&DMutexService_ServiceDesc, srv)
+	s.RegisterService(&MutualExclusion_ServiceDesc, srv)
 }
 
-func _DMutexService_DistribuedMutexService_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Req)
+func _MutualExclusion_RequestAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DMutexServiceServer).DistribuedMutexService(ctx, in)
+		return srv.(MutualExclusionServer).RequestAccess(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: DMutexService_DistribuedMutexService_FullMethodName,
+		FullMethod: MutualExclusion_RequestAccess_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DMutexServiceServer).DistribuedMutexService(ctx, req.(*Req))
+		return srv.(MutualExclusionServer).RequestAccess(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// DMutexService_ServiceDesc is the grpc.ServiceDesc for DMutexService service.
+func _MutualExclusion_Release_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MutualExclusionServer).Release(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MutualExclusion_Release_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MutualExclusionServer).Release(ctx, req.(*ReleaseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// MutualExclusion_ServiceDesc is the grpc.ServiceDesc for MutualExclusion service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var DMutexService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "DMutexService",
-	HandlerType: (*DMutexServiceServer)(nil),
+var MutualExclusion_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "MutualExclusion",
+	HandlerType: (*MutualExclusionServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "DistribuedMutexService",
-			Handler:    _DMutexService_DistribuedMutexService_Handler,
+			MethodName: "RequestAccess",
+			Handler:    _MutualExclusion_RequestAccess_Handler,
+		},
+		{
+			MethodName: "Release",
+			Handler:    _MutualExclusion_Release_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -14,7 +14,7 @@ type dmutexserver struct {
 }
 
 func (s *dmutexserver) DistributedMutexService(ctx context.Context, in *proto.Req) (*proto.Resp, error) {
-	return &proto.Resp{Timestamp: "1", Identifier: "hej"}, nil
+	return &proto.Resp{Name: "node", Timestamp: 1}, nil
 }
 
 func main() {

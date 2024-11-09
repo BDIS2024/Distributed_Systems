@@ -2,7 +2,7 @@ package main
 
 import (
 	proto "Assignment_4/proto"
-	"context"
+	"io"
 	"log"
 	"net"
 
@@ -10,16 +10,59 @@ import (
 )
 
 type dmutexserver struct {
-	proto.UnimplementedDMutexServiceServer
+	proto.UnimplementedMutualExclusionServer
 }
 
-func (s *dmutexserver) DistributedMutexService(ctx context.Context, in *proto.Req) (*proto.Resp, error) {
-	return &proto.Resp{Name: "node", Timestamp: 1}, nil
+func (s *dmutexserver) RequestAccess(stream proto.MutualExclusion_RequestAccessServer) error {
+	errorChan := make(chan error)
+	go receiveAccessRequest(stream, errorChan)
+
+	return <-errorChan
+}
+
+func (s *dmutexserver) Release(stream proto.MutualExclusion_ReleaseServer) error {
+	errorChan := make(chan error)
+	go receiveReleaseRequest(stream, errorChan)
+
+	return <-errorChan
+}
+
+func receiveAccessRequest(stream proto.MutualExclusion_RequestAccessServer, errchan chan error) {
+	for {
+		accessRequest, err := stream.Recv()
+		if err == io.EOF {
+			errchan <- err
+			return
+		}
+		if err != nil {
+			log.Printf("Error receiving message: %v\n", err)
+			errchan <- err
+			return
+		}
+		log.Printf("Received access request from: %s, at timestamp: %d\n", accessRequest.NodeId, accessRequest.Timestamp)
+	}
+}
+
+func receiveReleaseRequest(stream proto.MutualExclusion_ReleaseServer, errchan chan error) {
+	for {
+		releaseRequest, err := stream.Recv()
+		if err == io.EOF {
+			errchan <- err
+			return
+		}
+		if err != nil {
+			log.Printf("Error receiving message: %v\n", err)
+			errchan <- err
+			return
+		}
+		log.Printf("Received release request from: %s\n", releaseRequest.NodeId)
+	}
 }
 
 func main() {
+
 	grpcServer := grpc.NewServer()
-	proto.RegisterDMutexServiceServer(grpcServer, &dmutexserver{})
+	proto.RegisterMutualExclusionServer(grpcServer, &dmutexserver{})
 
 	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {

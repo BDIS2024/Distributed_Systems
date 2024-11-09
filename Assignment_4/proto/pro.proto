@@ -3,8 +3,8 @@ syntax='proto3';
 option go_package = 'Assignment_4/proto';
 
 service MutualExclusion {
-    rpc RequestAccess (Request) returns (Reply);
-    rpc Release (ReleaseRequest) returns (Ack);
+    rpc RequestAccess (stream Request) returns (stream Reply);
+    rpc Release (stream ReleaseRequest) returns (stream Ack);
   }
   
   message Request {

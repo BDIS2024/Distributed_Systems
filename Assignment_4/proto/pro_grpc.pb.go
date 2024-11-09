@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MutualExclusionClient interface {
-	RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
-	Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*Ack, error)
+	RequestAccess(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Request, Reply], error)
+	Release(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ReleaseRequest, Ack], error)
 }
 
 type mutualExclusionClient struct {
@@ -39,32 +39,38 @@ func NewMutualExclusionClient(cc grpc.ClientConnInterface) MutualExclusionClient
 	return &mutualExclusionClient{cc}
 }
 
-func (c *mutualExclusionClient) RequestAccess(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error) {
+func (c *mutualExclusionClient) RequestAccess(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Request, Reply], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Reply)
-	err := c.cc.Invoke(ctx, MutualExclusion_RequestAccess_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &MutualExclusion_ServiceDesc.Streams[0], MutualExclusion_RequestAccess_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[Request, Reply]{ClientStream: stream}
+	return x, nil
 }
 
-func (c *mutualExclusionClient) Release(ctx context.Context, in *ReleaseRequest, opts ...grpc.CallOption) (*Ack, error) {
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MutualExclusion_RequestAccessClient = grpc.BidiStreamingClient[Request, Reply]
+
+func (c *mutualExclusionClient) Release(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ReleaseRequest, Ack], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Ack)
-	err := c.cc.Invoke(ctx, MutualExclusion_Release_FullMethodName, in, out, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &MutualExclusion_ServiceDesc.Streams[1], MutualExclusion_Release_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &grpc.GenericClientStream[ReleaseRequest, Ack]{ClientStream: stream}
+	return x, nil
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MutualExclusion_ReleaseClient = grpc.BidiStreamingClient[ReleaseRequest, Ack]
 
 // MutualExclusionServer is the server API for MutualExclusion service.
 // All implementations must embed UnimplementedMutualExclusionServer
 // for forward compatibility.
 type MutualExclusionServer interface {
-	RequestAccess(context.Context, *Request) (*Reply, error)
-	Release(context.Context, *ReleaseRequest) (*Ack, error)
+	RequestAccess(grpc.BidiStreamingServer[Request, Reply]) error
+	Release(grpc.BidiStreamingServer[ReleaseRequest, Ack]) error
 	mustEmbedUnimplementedMutualExclusionServer()
 }
 
@@ -75,11 +81,11 @@ type MutualExclusionServer interface {
 // pointer dereference when methods are called.
 type UnimplementedMutualExclusionServer struct{}
 
-func (UnimplementedMutualExclusionServer) RequestAccess(context.Context, *Request) (*Reply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RequestAccess not implemented")
+func (UnimplementedMutualExclusionServer) RequestAccess(grpc.BidiStreamingServer[Request, Reply]) error {
+	return status.Errorf(codes.Unimplemented, "method RequestAccess not implemented")
 }
-func (UnimplementedMutualExclusionServer) Release(context.Context, *ReleaseRequest) (*Ack, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Release not implemented")
+func (UnimplementedMutualExclusionServer) Release(grpc.BidiStreamingServer[ReleaseRequest, Ack]) error {
+	return status.Errorf(codes.Unimplemented, "method Release not implemented")
 }
 func (UnimplementedMutualExclusionServer) mustEmbedUnimplementedMutualExclusionServer() {}
 func (UnimplementedMutualExclusionServer) testEmbeddedByValue()                         {}
@@ -102,41 +108,19 @@ func RegisterMutualExclusionServer(s grpc.ServiceRegistrar, srv MutualExclusionS
 	s.RegisterService(&MutualExclusion_ServiceDesc, srv)
 }
 
-func _MutualExclusion_RequestAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Request)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MutualExclusionServer).RequestAccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MutualExclusion_RequestAccess_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutualExclusionServer).RequestAccess(ctx, req.(*Request))
-	}
-	return interceptor(ctx, in, info, handler)
+func _MutualExclusion_RequestAccess_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MutualExclusionServer).RequestAccess(&grpc.GenericServerStream[Request, Reply]{ServerStream: stream})
 }
 
-func _MutualExclusion_Release_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ReleaseRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MutualExclusionServer).Release(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: MutualExclusion_Release_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutualExclusionServer).Release(ctx, req.(*ReleaseRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MutualExclusion_RequestAccessServer = grpc.BidiStreamingServer[Request, Reply]
+
+func _MutualExclusion_Release_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MutualExclusionServer).Release(&grpc.GenericServerStream[ReleaseRequest, Ack]{ServerStream: stream})
 }
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type MutualExclusion_ReleaseServer = grpc.BidiStreamingServer[ReleaseRequest, Ack]
 
 // MutualExclusion_ServiceDesc is the grpc.ServiceDesc for MutualExclusion service.
 // It's only intended for direct use with grpc.RegisterService,
@@ -144,16 +128,20 @@ func _MutualExclusion_Release_Handler(srv interface{}, ctx context.Context, dec 
 var MutualExclusion_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "MutualExclusion",
 	HandlerType: (*MutualExclusionServer)(nil),
-	Methods: []grpc.MethodDesc{
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "RequestAccess",
-			Handler:    _MutualExclusion_RequestAccess_Handler,
+			StreamName:    "RequestAccess",
+			Handler:       _MutualExclusion_RequestAccess_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 		{
-			MethodName: "Release",
-			Handler:    _MutualExclusion_Release_Handler,
+			StreamName:    "Release",
+			Handler:       _MutualExclusion_Release_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "proto/pro.proto",
 }

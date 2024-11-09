@@ -1,0 +1,73 @@
+2024/11/09 13:01:23 listen tcp: address 5050: missing port in address
+2024/11/09 13:01:38 Server started on ::5050
+2024/11/09 13:02:28 Client sent request: Name: q, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:02:28 Server recieved request: Name: q, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:02:29 Client sent request: Name: q, Message: q, Timestamp: (1)
+2024/11/09 13:02:29 Server recieved request: Name: q, Message: q, Timestamp: (1) at 2
+2024/11/09 13:02:29 Client sent request: Name: q, Message: q, Timestamp: (2)
+2024/11/09 13:02:29 Server recieved request: Name: q, Message: q, Timestamp: (2) at 3
+2024/11/09 13:02:30 Client sent request: Name: q, Message: q, Timestamp: (3)
+2024/11/09 13:02:30 Server recieved request: Name: q, Message: q, Timestamp: (3) at 4
+2024/11/09 13:02:30 Client sent request: Name: q, Message: q, Timestamp: (4)
+2024/11/09 13:02:30 Server recieved request: Name: q, Message: q, Timestamp: (4) at 5
+2024/11/09 13:02:30 Client sent request: Name: q, Message: q, Timestamp: (5)
+2024/11/09 13:02:30 Server recieved request: Name: q, Message: q, Timestamp: (5) at 6
+2024/11/09 13:02:30 Client sent request: Name: q, Message: q, Timestamp: (6)
+2024/11/09 13:02:30 Server recieved request: Name: q, Message: q, Timestamp: (6) at 7
+2024/11/09 13:02:31 Client sent request: Name: q, Message: q, Timestamp: (7)
+2024/11/09 13:02:31 Server recieved request: Name: q, Message: q, Timestamp: (7) at 8
+2024/11/09 13:02:31 Client sent request: Name: q, Message: q, Timestamp: (8)
+2024/11/09 13:02:31 Server recieved request: Name: q, Message: q, Timestamp: (8) at 9
+2024/11/09 13:02:31 Client sent request: Name: q, Message: q, Timestamp: (9)
+2024/11/09 13:02:31 Server recieved request: Name: q, Message: q, Timestamp: (9) at 10
+2024/11/09 13:02:31 Client sent request: Name: q, Message: , Timestamp: (10)
+2024/11/09 13:02:31 Server recieved request: Name: q, Message: , Timestamp: (10) at 11
+2024/11/09 13:02:34 Client sent request: Name: q, Message: q, Timestamp: (11)
+2024/11/09 13:02:34 Server recieved request: Name: q, Message: q, Timestamp: (11) at 12
+2024/11/09 13:02:34 Client sent request: Name: q, Message: q, Timestamp: (12)
+2024/11/09 13:02:34 Server recieved request: Name: q, Message: q, Timestamp: (12) at 13
+2024/11/09 13:02:34 Client sent request: Name: q, Message: q, Timestamp: (13)
+2024/11/09 13:02:34 Server recieved request: Name: q, Message: q, Timestamp: (13) at 14
+2024/11/09 13:02:34 Client sent request: Name: q, Message: , Timestamp: (14)
+2024/11/09 13:02:34 Server recieved request: Name: q, Message: , Timestamp: (14) at 15
+2024/11/09 13:02:41 Client sent request: Name: q, Message: q, Timestamp: (15)
+2024/11/09 13:02:41 Server recieved request: Name: q, Message: q, Timestamp: (15) at 16
+2024/11/09 13:02:45 Client sent request: Name: q, Message: q, Timestamp: (16)
+2024/11/09 13:02:45 Server recieved request: Name: q, Message: q, Timestamp: (16) at 17
+2024/11/09 13:02:45 Client sent request: Name: q, Message: q, Timestamp: (17)
+2024/11/09 13:02:45 Server recieved request: Name: q, Message: q, Timestamp: (17) at 18
+2024/11/09 13:02:46 Client sent request: Name: q, Message: q, Timestamp: (18)
+2024/11/09 13:02:46 Server recieved request: Name: q, Message: q, Timestamp: (18) at 19
+2024/11/09 13:02:46 Client sent request: Name: q, Message: q, Timestamp: (19)
+2024/11/09 13:02:46 Server recieved request: Name: q, Message: q, Timestamp: (19) at 20
+2024/11/09 13:02:53 Client sent request: Name: q, Message: q, Timestamp: (20)
+2024/11/09 13:02:53 Server recieved request: Name: q, Message: q, Timestamp: (20) at 21
+2024/11/09 13:02:53 Client sent request: Name: q, Message: q, Timestamp: (21)
+2024/11/09 13:02:53 Server recieved request: Name: q, Message: q, Timestamp: (21) at 22
+2024/11/09 13:02:53 Client sent request: Name: q, Message: q, Timestamp: (22)
+2024/11/09 13:02:53 Server recieved request: Name: q, Message: q, Timestamp: (22) at 23
+2024/11/09 13:04:08 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/09 13:04:12 Server started on ::5050
+2024/11/09 13:04:19 Client sent request: Name: node1, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:04:19 Server recieved request: Name: node1, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:04:58 Server started on ::5050
+2024/11/09 13:05:02 Server started on ::5051
+2024/11/09 13:05:10 Client sent request: Name: node1, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:05:10 Server recieved request: Name: node1, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:05:12 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/09 13:05:20 Client sent request: Name: node2, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:05:20 Server recieved request: Name: node2, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:05:23 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/09 13:24:15 Server started on ::5050
+2024/11/09 13:24:19 Server started on ::5051
+2024/11/09 13:24:43 EOF
+2024/11/09 13:24:56 EOF
+2024/11/09 13:25:01 EOF
+2024/11/09 13:28:49 Server started on ::5050
+2024/11/09 13:28:56 Client sent request: Name: 1, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:28:56 Server recieved request: Name: 1, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:29:06 Server started on ::5051
+2024/11/09 13:29:19 Client sent request: Name: 2, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:29:19 Server recieved request: Name: 2, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:29:20 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/09 13:29:21 Error receiving message: rpc error: code = Canceled desc = context canceled

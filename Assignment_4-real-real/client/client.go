@@ -16,6 +16,13 @@ import (
 
 var counter int32 = 0
 var name = ""
+var port = ""
+
+type Node struct {
+	stream proto.ChittyChatService_ChatServiceClient
+	conn   *grpc.ClientConn
+	port   string
+}
 
 func main() {
 	//logs
@@ -27,7 +34,7 @@ func main() {
 
 	log.SetOutput(f)
 
-	//connection
+	// set the node name
 	reader := bufio.NewReader(os.Stdin)
 
 	//stream
@@ -47,12 +54,31 @@ func main() {
 	}
 	name = strings.TrimSpace(name)
 
+	// set node server port
+	fmt.Println("Enter server port:")
+	port, err = reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+	port = strings.TrimSpace(port)
 
-	log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
+	// get other node streams
+	node1 := connectToHost("5051")
+	node2 := connectToHost("5052")
+
+	defer node1.conn.Close()
+	defer node2.conn.Close()
+
+	message := "i want to join"
+
+	// broadcast to other nodes
+	log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
+	broadcast(message, []proto.ChittyChatService_ChatServiceClient{node1.stream, node2.stream})
+
 	waitc := make(chan bool)
-	//donec := make(chan bool)
+	donec := make(chan bool)
 
-	//go retrieveMessage(waitc, donec, stream)
+	go retrieveMessage(waitc, donec)
 	//go sendMessage(donec, stream, msg.Name)
 
 	<-waitc
@@ -72,7 +98,13 @@ func connectToHost(host string) (proto.DmutexService_DmutexClient, *grpc.ClientC
 		log.Fatal(err.Error())
 	}
 
-	return stream, conn
+	node := Node{
+		stream: stream,
+		conn:   conn,
+		port:   host,
+	}
+
+	return node
 }
 
 func broadcast(message string, nodes []proto.DmutexServiceClient) {
@@ -90,14 +122,16 @@ func broadcast(message string, nodes []proto.DmutexServiceClient) {
 	}
 }
 
-func retrieveMessage(waitc chan bool, donec chan bool, stream proto.DmutexService_DmutexClient) {
+func retrieveMessage(waitc chan bool, donec chan bool) {
+	self := connectToHost(port)
+
 	for {
 		select {
 		case <-donec:
 			waitc <- true
 			return
 		default:
-			in, err := stream.Recv()
+			in, err := self.stream.Recv()
 			if err == io.EOF {
 				waitc <- true
 				return

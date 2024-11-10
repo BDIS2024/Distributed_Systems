@@ -19,7 +19,7 @@ var name = ""
 var port = ""
 
 type Node struct {
-	stream proto.ChittyChatService_ChatServiceClient
+	stream proto.DmutexService_DmutexClient
 	conn   *grpc.ClientConn
 	port   string
 }
@@ -73,7 +73,7 @@ func main() {
 
 	// broadcast to other nodes
 	log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
-	broadcast(message, []proto.ChittyChatService_ChatServiceClient{node1.stream, node2.stream})
+	broadcast(message, []proto.DmutexService_DmutexClient{node1.stream, node2.stream})
 
 	waitc := make(chan bool)
 	donec := make(chan bool)

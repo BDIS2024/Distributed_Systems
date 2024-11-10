@@ -24,7 +24,7 @@ func main() {
 	log.SetOutput(f)
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterDmutexServiceServer(grpcServer, &ChittyChatServer{})
+	proto.RegisterDmutexServiceServer(grpcServer, &DmutexServer{})
 
 	fmt.Println("Enter port number:")
 	reader := bufio.NewReader(os.Stdin)
@@ -47,7 +47,7 @@ func main() {
 	}
 }
 
-type ChittyChatServer struct {
+type DmutexServer struct {
 	proto.UnimplementedDmutexServiceServer
 }
 
@@ -68,7 +68,7 @@ var handler = MessageHandler{
 
 var counter int32 = 0
 
-func (s *ChittyChatServer) ChatService(stream proto.DmutexService_DmutexServer) error {
+func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 
 	go retrieveMessagesFromClient(stream, errorChan)

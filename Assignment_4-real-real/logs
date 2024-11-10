@@ -6,3 +6,17 @@
 2024/11/10 20:34:14 Client: 1, sent message: i want to join, with timestamp: 0 to :5050 and :5051
 2024/11/10 20:35:27 Error receiving message: rpc error: code = Canceled desc = context canceled
 2024/11/10 20:35:27 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:31:09 Server started on :5050
+2024/11/10 21:31:14 Server started on :5051
+2024/11/10 21:31:22 Server started on :5052
+2024/11/10 21:31:38 Client: 1, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/10 21:31:38 EOF
+2024/11/10 21:36:16 Server started on :5050
+2024/11/10 21:36:19 Server started on :5051
+2024/11/10 21:36:22 Server started on :5052
+2024/11/10 21:36:27 Client: 1, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/10 21:36:27 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
+2024/11/10 21:36:27 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
+2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled

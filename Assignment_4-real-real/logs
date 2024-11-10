@@ -71,3 +71,7 @@
 2024/11/09 13:29:19 Server recieved request: Name: 2, Message: has joined the chat., Timestamp: (0) at 1
 2024/11/09 13:29:20 Error receiving message: rpc error: code = Canceled desc = context canceled
 2024/11/09 13:29:21 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/09 13:46:42 Server started on ::5050
+2024/11/09 13:46:47 Client sent request: Name: 1, Message: has joined the chat., Timestamp: (0)
+2024/11/09 13:46:47 Server recieved request: Name: 1, Message: has joined the chat., Timestamp: (0) at 1
+2024/11/09 13:46:51 Error receiving message: rpc error: code = Canceled desc = context canceled

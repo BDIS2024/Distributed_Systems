@@ -36,17 +36,6 @@ func main() {
 
 	// set the node name
 	reader := bufio.NewReader(os.Stdin)
-
-	//stream
-
-	node1stream, node1conn := connectToHost("5050")
-	node2stream, node2conn := connectToHost("5051")
-
-	defer node1conn.Close()
-	defer node2conn.Close()
-
-	broadcast("i want to join", []proto.DmutexService_DmutexClient{node1stream, node2stream})
-
 	fmt.Println("Enter your name:")
 	name, err = reader.ReadString('\n')
 	if err != nil {
@@ -85,7 +74,7 @@ func main() {
 
 }
 
-func connectToHost(host string) (proto.DmutexService_DmutexClient, *grpc.ClientConn) {
+func connectToHost(host string) Node {
 	conn, err := grpc.NewClient("localhost:"+host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err.Error())

@@ -1,7 +1,7 @@
 package main
 
 import (
-	proto "Assignment_4-real-real/proto"
+	proto "Assignment_4/proto"
 	"bufio"
 	"fmt"
 	"io"

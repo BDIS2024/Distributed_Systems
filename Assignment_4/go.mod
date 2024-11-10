@@ -1,4 +1,4 @@
-module Assignment_4-real-real
+module Assignment_4
 
 go 1.23.0
 

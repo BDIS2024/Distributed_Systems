@@ -15,6 +15,7 @@ import (
 )
 
 var counter int32 = 0
+var name = ""
 
 func main() {
 	//logs
@@ -29,45 +30,23 @@ func main() {
 	//connection
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Enter port number:")
-	port, err := reader.ReadString('\n')
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	port = strings.TrimSpace(port)
-	host := "localhost:" + port
-
-	conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer conn.Close()
-
 	//stream
-	client := proto.NewChittyChatServiceClient(conn)
 
-	stream, err := client.ChatService(context.Background())
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	node1stream, node1conn := connectToHost("5050")
+	node2stream, node2conn := connectToHost("5051")
+
+	defer node1conn.Close()
+	defer node2conn.Close()
+
+	broadcast("i want to join", []proto.ChittyChatService_ChatServiceClient{node1stream, node2stream})
 
 	fmt.Println("Enter your name:")
-	name, err := reader.ReadString('\n')
+	name, err = reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	name = strings.TrimSpace(name)
 
-	msg := proto.ClientMessage{
-		Name:      name,
-		Message:   "has joined the chat.",
-		Timestamp: counter,
-	}
-
-	err = stream.Send(&msg)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
 
 	log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
 	waitc := make(chan bool)
@@ -78,6 +57,37 @@ func main() {
 
 	<-waitc
 
+}
+
+func connectToHost(host string) (proto.ChittyChatService_ChatServiceClient, *grpc.ClientConn) {
+	conn, err := grpc.NewClient("localhost:"+host, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	client := proto.NewChittyChatServiceClient(conn)
+
+	stream, err := client.ChatService(context.Background())
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	return stream, conn
+}
+
+func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient) {
+	msg := proto.ClientMessage{
+		Name:      name,
+		Message:   message,
+		Timestamp: counter,
+	}
+
+	for _, node := range nodes {
+		err := node.Send(&msg)
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
 }
 
 func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient) {

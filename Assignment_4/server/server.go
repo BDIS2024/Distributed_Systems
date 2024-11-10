@@ -29,7 +29,7 @@ func main() {
 	var port string
 	// Port
 	if len(os.Args) > 1 {
-		port := os.Args[1]
+		port = os.Args[1]
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -38,7 +38,7 @@ func main() {
 	} else {
 		fmt.Println("Enter port number:")
 		reader := bufio.NewReader(os.Stdin)
-		port, err := reader.ReadString('\n')
+		port, err = reader.ReadString('\n')
 		if err != nil {
 			log.Fatal(err.Error())
 		}
@@ -51,11 +51,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Server started on :%s", port)
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Printf("Server started on %s", port)
 }
 
 type DmutexServer struct {

@@ -107,7 +107,7 @@ func connectToHost(host string) (proto.DmutexService_DmutexClient, *grpc.ClientC
 	return node
 }
 
-func broadcast(message string, nodes []proto.DmutexServiceClient) {
+func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
 	msg := proto.Req{
 		Name:      name,
 		Message:   message,

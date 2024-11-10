@@ -1,22 +1,16 @@
-
-2024/11/10 20:34:04 Server started on ::5050
-2024/11/10 20:34:07 Server started on ::5051
-2024/11/10 20:34:14 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
-2024/11/10 20:34:14 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
-2024/11/10 20:34:14 Client: 1, sent message: i want to join, with timestamp: 0 to :5050 and :5051
-2024/11/10 20:35:27 Error receiving message: rpc error: code = Canceled desc = context canceled
-2024/11/10 20:35:27 Error receiving message: rpc error: code = Canceled desc = context canceled
-2024/11/10 21:31:09 Server started on :5050
-2024/11/10 21:31:14 Server started on :5051
-2024/11/10 21:31:22 Server started on :5052
-2024/11/10 21:31:38 Client: 1, sent message: i want to join, with timestamp: 0 to :5051 and :5052
-2024/11/10 21:31:38 EOF
-2024/11/10 21:36:16 Server started on :5050
-2024/11/10 21:36:19 Server started on :5051
-2024/11/10 21:36:22 Server started on :5052
-2024/11/10 21:36:27 Client: 1, sent message: i want to join, with timestamp: 0 to :5051 and :5052
-2024/11/10 21:36:27 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
-2024/11/10 21:36:27 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
-2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled
-2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled
-2024/11/10 21:36:29 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:26:51 Server started on :5050
+2024/11/10 21:26:53 Server started on :5051
+2024/11/10 21:27:22 Server started on :5049
+2024/11/10 21:27:25 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:5052: connect: connection refused"
+2024/11/10 21:27:25 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:28:31 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:5052: connect: connection refused"
+2024/11/10 21:28:31 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:28:57 rpc error: code = Unavailable desc = connection error: desc = "transport: Error while dialing: dial tcp [::1]:5052: connect: connection refused"
+2024/11/10 21:28:57 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/10 21:29:19 Server started on :5050
+2024/11/10 21:29:24 Server started on :5051
+2024/11/10 21:29:29 Server started on :5052
+2024/11/10 21:29:50 Client: 1, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/10 21:29:50 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
+2024/11/10 21:29:50 Server recieved request: Name: 1, Message: i want to join, Timestamp: (0) at 1
+2024/11/10 21:30:12 Error receiving message:rpc error: code = Unavailable desc = error reading from server: EOF

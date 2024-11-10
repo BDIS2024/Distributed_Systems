@@ -96,8 +96,8 @@ func connectToHost(host string) Node {
 	return node
 }
 
-func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
-	msg := proto.Req{
+func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient) {
+	msg := proto.Message{
 		Name:      name,
 		Message:   message,
 		Timestamp: counter,
@@ -147,7 +147,7 @@ func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, usern
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			err = stream.Send(&proto.Req{
+			err = stream.Send(&proto.Message{
 				Name:      username,
 				Message:   "has left the chat.",
 				Timestamp: counter,
@@ -165,7 +165,7 @@ func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, usern
 		}
 		counter++
 
-		msg := proto.Req{
+		msg := proto.Message{
 			Name:      username,
 			Message:   message,
 			Timestamp: counter,

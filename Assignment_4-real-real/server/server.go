@@ -102,12 +102,12 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 	}
 }
 
-func broadcastMessageToClients(message *proto.Ack) {
+func broadcastMessageToClients(message *proto.Message) {
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
 	counter++
 	for clientName, clientStream := range handler.Clients {
-		err := clientStream.Send(&proto.Ack{
+		err := clientStream.Send(&proto.Message{
 			Name:      message.Name,
 			Message:   message.Message,
 			Timestamp: counter,
@@ -124,7 +124,7 @@ func sendErrorToCLient(clientName string, erro string) {
 	defer handler.Lock.Unlock()
 	counter++
 
-	err := handler.Clients[clientName].Send(&proto.Ack{
+	err := handler.Clients[clientName].Send(&proto.Message{
 		Name:      "Server",
 		Message:   erro,
 		Timestamp: counter,

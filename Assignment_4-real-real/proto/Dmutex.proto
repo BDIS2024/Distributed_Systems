@@ -2,20 +2,14 @@ syntax = 'proto3';
 
 option go_package = 'Assignment_4-real-real/proto';
 
-message req{
-    string name = 1;
-    string message = 2;
-    int32 timestamp = 3;
-}
-
-message ack{
+message Message{
     string name = 1;
     string message = 2;
     int32 timestamp = 3;
 }
 
 service DmutexService{
-    rpc Dmutex (stream req) returns (stream ack){}
+    rpc Dmutex (stream Message) returns (stream Message){}
 }
 
 // to compile

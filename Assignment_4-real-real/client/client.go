@@ -96,7 +96,7 @@ func connectToHost(host string) Node {
 	return node
 }
 
-func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient) {
+func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
 	msg := proto.Message{
 		Name:      name,
 		Message:   message,

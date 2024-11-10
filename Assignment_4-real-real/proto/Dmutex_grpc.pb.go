@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DmutexServiceClient interface {
-	Dmutex(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Req, Ack], error)
+	Dmutex(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error)
 }
 
 type dmutexServiceClient struct {
@@ -37,24 +37,24 @@ func NewDmutexServiceClient(cc grpc.ClientConnInterface) DmutexServiceClient {
 	return &dmutexServiceClient{cc}
 }
 
-func (c *dmutexServiceClient) Dmutex(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Req, Ack], error) {
+func (c *dmutexServiceClient) Dmutex(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &DmutexService_ServiceDesc.Streams[0], DmutexService_Dmutex_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[Req, Ack]{ClientStream: stream}
+	x := &grpc.GenericClientStream[Message, Message]{ClientStream: stream}
 	return x, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type DmutexService_DmutexClient = grpc.BidiStreamingClient[Req, Ack]
+type DmutexService_DmutexClient = grpc.BidiStreamingClient[Message, Message]
 
 // DmutexServiceServer is the server API for DmutexService service.
 // All implementations must embed UnimplementedDmutexServiceServer
 // for forward compatibility.
 type DmutexServiceServer interface {
-	Dmutex(grpc.BidiStreamingServer[Req, Ack]) error
+	Dmutex(grpc.BidiStreamingServer[Message, Message]) error
 	mustEmbedUnimplementedDmutexServiceServer()
 }
 
@@ -65,7 +65,7 @@ type DmutexServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDmutexServiceServer struct{}
 
-func (UnimplementedDmutexServiceServer) Dmutex(grpc.BidiStreamingServer[Req, Ack]) error {
+func (UnimplementedDmutexServiceServer) Dmutex(grpc.BidiStreamingServer[Message, Message]) error {
 	return status.Errorf(codes.Unimplemented, "method Dmutex not implemented")
 }
 func (UnimplementedDmutexServiceServer) mustEmbedUnimplementedDmutexServiceServer() {}
@@ -90,11 +90,11 @@ func RegisterDmutexServiceServer(s grpc.ServiceRegistrar, srv DmutexServiceServe
 }
 
 func _DmutexService_Dmutex_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(DmutexServiceServer).Dmutex(&grpc.GenericServerStream[Req, Ack]{ServerStream: stream})
+	return srv.(DmutexServiceServer).Dmutex(&grpc.GenericServerStream[Message, Message]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type DmutexService_DmutexServer = grpc.BidiStreamingServer[Req, Ack]
+type DmutexService_DmutexServer = grpc.BidiStreamingServer[Message, Message]
 
 // DmutexService_ServiceDesc is the grpc.ServiceDesc for DmutexService service.
 // It's only intended for direct use with grpc.RegisterService,

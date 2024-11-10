@@ -77,7 +77,7 @@ type MessageHandler struct {
 	Clients: make(map[string]proto.DmutexService_DmutexServer),
 }*/
 
-func (s *DmutexServer) ChatService(stream proto.DmutexService_DmutexServer) error {
+func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 
 	go retrieveMessagesFromClient(stream, errorChan)

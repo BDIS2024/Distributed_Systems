@@ -40,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Server started on :%s", port)
+	log.Printf("Server started on %s", port)
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal(err)

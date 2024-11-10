@@ -66,8 +66,6 @@ var handler = MessageHandler{
 	Clients: make(map[string]proto.ChittyChatService_ChatServiceServer),
 }
 
-var counter int32 = 0
-
 func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServiceServer) error {
 	errorChan := make(chan error)
 
@@ -76,8 +74,10 @@ func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServic
 	return <-errorChan
 }
 
-func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer, errorChan chan error) {
+var clientNodePair proto.ChittyChatService_ChatServiceServer
+var messageStorage []proto.ClientMessage
 
+func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer, errorChan chan error) {
 	for {
 		message, err := stream.Recv()
 		if err == io.EOF {
@@ -89,55 +89,57 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 			errorChan <- err
 			return
 		}
+		// HANDLE MESSAGE
+		fmt.Printf("Recived message: %v\n", message)
+		if message.Name == "Connect" {
 
-		// if len(message.Message) > 128 {
-		// 	sendErrorToCLient(clientName, "Message has to be under 128 characters.")
-		// 	continue
-		// }
+			// Connect
+			clientNodePair = stream
+			fmt.Printf("Formed a pair with:%v\n", clientNodePair)
+			sendStoredMessages()
 
-		counter = max(counter, message.Timestamp) + 1
-		fmt.Println(message)
-		log.Printf("Server recieved request: Name: %s, Message: %s, Timestamp: (%d) at %d\n", message.Name, message.Message, message.Timestamp, counter)
-		//broadcastMessageToClients(message)
-	}
-}
-
-func broadcastMessageToClients(message *proto.ClientMessage) {
-	handler.Lock.Lock()
-	defer handler.Lock.Unlock()
-	counter++
-	for clientName, clientStream := range handler.Clients {
-		err := clientStream.Send(&proto.ServerMessage{
-			Name:      message.Name,
-			Message:   message.Message,
-			Timestamp: counter,
-		})
-		if err != nil {
-			log.Printf("Error sending message to %s: %v", clientName, err)
+		} else {
+			// redirect message to main server
+			if clientNodePair == nil {
+				fmt.Println("Recived message without pair - Storing message for later...")
+			} else {
+				sendMessageToPair(message)
+			}
 		}
 	}
-	log.Printf("Server sent response: Name: %s, Message: %s, Timestamp: (%d)\n", message.Name, message.Message, counter)
 }
 
-func sendErrorToCLient(clientName string, erro string) {
-	handler.Lock.Lock()
-	defer handler.Lock.Unlock()
-	counter++
+func sendStoredMessages() {
+	if len(messageStorage) > 0 {
+		for i := 0; i < len(messageStorage); i++ {
+			sendMessageToPair(&messageStorage[i])
+		}
+		messageStorage = []proto.ClientMessage{}
+	}
+}
 
-	err := handler.Clients[clientName].Send(&proto.ServerMessage{
-		Name:      "Server",
-		Message:   erro,
-		Timestamp: counter,
-	})
+func sendMessageToPair(message *proto.ClientMessage) {
+	msg := ServerMessage{
+		name: msg
+	}
+	err := clientNodePair.Send(message)
 	if err != nil {
-		log.Printf("Error sending message to %s: %v", clientName, err)
-
+		log.Printf("Error sending message: %v\n", message)
+	} else {
+		fmt.Printf("Sucessfully sent message: %v\n", message)
 	}
 }
 
-func max(counter int32, comparecounter int32) int32 {
-	if counter < comparecounter {
-		return comparecounter
-	}
-	return counter
-}
+/*
+
+	var inCriticalSection = false
+var replies = 0
+		if message.Name == "Request" {
+
+
+			if inCriticalSection {
+				// Add client to "reply list"
+			}
+		} else if message.Name == "Reply" {
+			// Send message to
+		}*/

@@ -36,7 +36,7 @@ func main() {
 
 	// set the node name
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter your name:")
+	fmt.Println("Enter node identifier:")
 	name, err = reader.ReadString('\n')
 	if err != nil {
 		log.Fatal(err.Error())

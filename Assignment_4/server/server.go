@@ -40,7 +40,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("Server started on %s", port)
+	log.Printf("Server started on :%s", port)
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal(err)
@@ -62,13 +62,11 @@ type MessageHandler struct {
 	Lock    sync.Mutex
 }
 
-var handler = MessageHandler{
+/*var handler = MessageHandler{
 	Clients: make(map[string]proto.DmutexService_DmutexServer),
-}
+}*/
 
-var counter int32 = 0
-
-func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
+func (s *DmutexServer) ChatService(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 
 	go retrieveMessagesFromClient(stream, errorChan)
@@ -76,8 +74,10 @@ func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
 	return <-errorChan
 }
 
-func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorChan chan error) {
+var clientNodePair proto.DmutexService_DmutexServer
+var messageStorage []proto.Message
 
+func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorChan chan error) {
 	for {
 		message, err := stream.Recv()
 		if err == io.EOF {
@@ -89,55 +89,54 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 			errorChan <- err
 			return
 		}
+		// HANDLE MESSAGE
+		fmt.Printf("Recived message: %v\n", message)
+		if message.Name == "Connect" {
 
-		// if len(message.Message) > 128 {
-		// 	sendErrorToCLient(clientName, "Message has to be under 128 characters.")
-		// 	continue
-		// }
+			// Connect
+			clientNodePair = stream
+			fmt.Printf("Formed a pair with:%v\n", clientNodePair)
+			sendStoredMessages()
 
-		counter = max(counter, message.Timestamp) + 1
-		fmt.Println(message)
-		log.Printf("Server recieved request: Name: %s, Message: %s, Timestamp: (%d) at %d\n", message.Name, message.Message, message.Timestamp, counter)
-		//broadcastMessageToClients(message)
-	}
-}
-
-func broadcastMessageToClients(message *proto.Message) {
-	handler.Lock.Lock()
-	defer handler.Lock.Unlock()
-	counter++
-	for clientName, clientStream := range handler.Clients {
-		err := clientStream.Send(&proto.Message{
-			Name:      message.Name,
-			Message:   message.Message,
-			Timestamp: counter,
-		})
-		if err != nil {
-			log.Printf("Error sending message to %s: %v", clientName, err)
+		} else {
+			// redirect message to main server
+			if clientNodePair == nil {
+				fmt.Println("Recived message without pair - Storing message for later...")
+			} else {
+				sendMessageToPair(message)
+			}
 		}
 	}
-	log.Printf("Server sent response: Name: %s, Message: %s, Timestamp: (%d)\n", message.Name, message.Message, counter)
 }
 
-func sendErrorToCLient(clientName string, erro string) {
-	handler.Lock.Lock()
-	defer handler.Lock.Unlock()
-	counter++
+func sendStoredMessages() {
+	if len(messageStorage) > 0 {
+		for i := 0; i < len(messageStorage); i++ {
+			sendMessageToPair(&messageStorage[i])
+		}
+		messageStorage = []proto.Message{}
+	}
+}
 
-	err := handler.Clients[clientName].Send(&proto.Message{
-		Name:      "Server",
-		Message:   erro,
-		Timestamp: counter,
-	})
+func sendMessageToPair(message *proto.Message) {
+	err := clientNodePair.Send(message)
 	if err != nil {
-		log.Printf("Error sending message to %s: %v", clientName, err)
-
+		log.Printf("Error sending message: %v\n", message)
+	} else {
+		fmt.Printf("Sucessfully sent message: %v\n", message)
 	}
 }
 
-func max(counter int32, comparecounter int32) int32 {
-	if counter < comparecounter {
-		return comparecounter
-	}
-	return counter
-}
+/*
+
+	var inCriticalSection = false
+var replies = 0
+		if message.Name == "Request" {
+
+
+			if inCriticalSection {
+				// Add client to "reply list"
+			}
+		} else if message.Name == "Reply" {
+			// Send message to
+		}*/

@@ -13,5 +13,5 @@ service DmutexService{
 }
 
 // to compile
-// cd to root directory (Assignment_4-real-real)
+// cd to root directory (Assignment_4)
 // protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/Dmutex.proto

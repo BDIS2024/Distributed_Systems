@@ -38,7 +38,7 @@ func main() {
 	defer node1conn.Close()
 	defer node2conn.Close()
 
-	broadcast("i want to join", []proto.ChittyChatService_ChatServiceClient{node1stream, node2stream})
+	broadcast("i want to join", []proto.DmutexService_DmutexClient{node1stream, node2stream})
 
 	fmt.Println("Enter your name:")
 	name, err = reader.ReadString('\n')
@@ -59,15 +59,15 @@ func main() {
 
 }
 
-func connectToHost(host string) (proto.ChittyChatService_ChatServiceClient, *grpc.ClientConn) {
+func connectToHost(host string) (proto.DmutexService_DmutexClient, *grpc.ClientConn) {
 	conn, err := grpc.NewClient("localhost:"+host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	client := proto.NewChittyChatServiceClient(conn)
+	client := proto.NewDmutexServiceClient(conn)
 
-	stream, err := client.ChatService(context.Background())
+	stream, err := client.Dmutex(context.Background())
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -75,8 +75,8 @@ func connectToHost(host string) (proto.ChittyChatService_ChatServiceClient, *grp
 	return stream, conn
 }
 
-func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient) {
-	msg := proto.ClientMessage{
+func broadcast(message string, nodes []proto.DmutexServiceClient) {
+	msg := proto.Req{
 		Name:      name,
 		Message:   message,
 		Timestamp: counter,
@@ -90,7 +90,7 @@ func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient
 	}
 }
 
-func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatService_ChatServiceClient) {
+func retrieveMessage(waitc chan bool, donec chan bool, stream proto.DmutexService_DmutexClient) {
 	for {
 		select {
 		case <-donec:
@@ -114,7 +114,7 @@ func retrieveMessage(waitc chan bool, donec chan bool, stream proto.ChittyChatSe
 	}
 }
 
-func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClient, username string) {
+func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, username string) {
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		message, err := reader.ReadString('\n')
@@ -124,7 +124,7 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			err = stream.Send(&proto.ClientMessage{
+			err = stream.Send(&proto.Req{
 				Name:      username,
 				Message:   "has left the chat.",
 				Timestamp: counter,
@@ -142,7 +142,7 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		}
 		counter++
 
-		msg := proto.ClientMessage{
+		msg := proto.Req{
 			Name:      username,
 			Message:   message,
 			Timestamp: counter,

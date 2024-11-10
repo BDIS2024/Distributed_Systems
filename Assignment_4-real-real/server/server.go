@@ -24,7 +24,7 @@ func main() {
 	log.SetOutput(f)
 
 	grpcServer := grpc.NewServer()
-	proto.RegisterChittyChatServiceServer(grpcServer, &ChittyChatServer{})
+	proto.RegisterDmutexServiceServer(grpcServer, &ChittyChatServer{})
 
 	fmt.Println("Enter port number:")
 	reader := bufio.NewReader(os.Stdin)
@@ -48,7 +48,7 @@ func main() {
 }
 
 type ChittyChatServer struct {
-	proto.UnimplementedChittyChatServiceServer
+	proto.UnimplementedDmutexServiceServer
 }
 
 type MessageObject struct {
@@ -58,17 +58,17 @@ type MessageObject struct {
 }
 
 type MessageHandler struct {
-	Clients map[string]proto.ChittyChatService_ChatServiceServer
+	Clients map[string]proto.DmutexService_DmutexServer
 	Lock    sync.Mutex
 }
 
 var handler = MessageHandler{
-	Clients: make(map[string]proto.ChittyChatService_ChatServiceServer),
+	Clients: make(map[string]proto.DmutexService_DmutexServer),
 }
 
 var counter int32 = 0
 
-func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServiceServer) error {
+func (s *ChittyChatServer) ChatService(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 
 	go retrieveMessagesFromClient(stream, errorChan)
@@ -76,7 +76,7 @@ func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServic
 	return <-errorChan
 }
 
-func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer, errorChan chan error) {
+func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorChan chan error) {
 
 	for {
 		message, err := stream.Recv()
@@ -102,12 +102,12 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 	}
 }
 
-func broadcastMessageToClients(message *proto.ClientMessage) {
+func broadcastMessageToClients(message *proto.Ack) {
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
 	counter++
 	for clientName, clientStream := range handler.Clients {
-		err := clientStream.Send(&proto.ServerMessage{
+		err := clientStream.Send(&proto.Ack{
 			Name:      message.Name,
 			Message:   message.Message,
 			Timestamp: counter,
@@ -124,7 +124,7 @@ func sendErrorToCLient(clientName string, erro string) {
 	defer handler.Lock.Unlock()
 	counter++
 
-	err := handler.Clients[clientName].Send(&proto.ServerMessage{
+	err := handler.Clients[clientName].Send(&proto.Ack{
 		Name:      "Server",
 		Message:   erro,
 		Timestamp: counter,

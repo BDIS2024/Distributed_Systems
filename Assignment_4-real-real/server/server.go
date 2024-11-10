@@ -102,12 +102,12 @@ func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer
 	}
 }
 
-func broadcastMessageToClients(message *proto.ClientMessage) {
+func broadcastMessageToClients(message *proto.Message) {
 	handler.Lock.Lock()
 	defer handler.Lock.Unlock()
 	counter++
 	for clientName, clientStream := range handler.Clients {
-		err := clientStream.Send(&proto.ServerMessage{
+		err := clientStream.Send(&proto.Message{
 			Name:      message.Name,
 			Message:   message.Message,
 			Timestamp: counter,
@@ -124,7 +124,7 @@ func sendErrorToCLient(clientName string, erro string) {
 	defer handler.Lock.Unlock()
 	counter++
 
-	err := handler.Clients[clientName].Send(&proto.ServerMessage{
+	err := handler.Clients[clientName].Send(&proto.Message{
 		Name:      "Server",
 		Message:   erro,
 		Timestamp: counter,

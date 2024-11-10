@@ -97,7 +97,7 @@ func connectToHost(host string) Node {
 }
 
 func broadcast(message string, nodes []proto.ChittyChatService_ChatServiceClient) {
-	msg := proto.ClientMessage{
+	msg := proto.Message{
 		Name:      name,
 		Message:   message,
 		Timestamp: counter,
@@ -148,7 +148,7 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		message = strings.TrimSpace(message)
 
 		if message == "leave" {
-			err = stream.Send(&proto.ClientMessage{
+			err = stream.Send(&proto.Message{
 				Name:      username,
 				Message:   "has left the chat.",
 				Timestamp: counter,
@@ -166,7 +166,7 @@ func sendMessage(donec chan bool, stream proto.ChittyChatService_ChatServiceClie
 		}
 		counter++
 
-		msg := proto.ClientMessage{
+		msg := proto.Message{
 			Name:      username,
 			Message:   message,
 			Timestamp: counter,

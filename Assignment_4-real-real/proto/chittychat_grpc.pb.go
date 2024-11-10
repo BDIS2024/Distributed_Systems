@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ChittyChatServiceClient interface {
-	ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ClientMessage, ServerMessage], error)
+	ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error)
 }
 
 type chittyChatServiceClient struct {
@@ -37,24 +37,24 @@ func NewChittyChatServiceClient(cc grpc.ClientConnInterface) ChittyChatServiceCl
 	return &chittyChatServiceClient{cc}
 }
 
-func (c *chittyChatServiceClient) ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[ClientMessage, ServerMessage], error) {
+func (c *chittyChatServiceClient) ChatService(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &ChittyChatService_ServiceDesc.Streams[0], ChittyChatService_ChatService_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[ClientMessage, ServerMessage]{ClientStream: stream}
+	x := &grpc.GenericClientStream[Message, Message]{ClientStream: stream}
 	return x, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChittyChatService_ChatServiceClient = grpc.BidiStreamingClient[ClientMessage, ServerMessage]
+type ChittyChatService_ChatServiceClient = grpc.BidiStreamingClient[Message, Message]
 
 // ChittyChatServiceServer is the server API for ChittyChatService service.
 // All implementations must embed UnimplementedChittyChatServiceServer
 // for forward compatibility.
 type ChittyChatServiceServer interface {
-	ChatService(grpc.BidiStreamingServer[ClientMessage, ServerMessage]) error
+	ChatService(grpc.BidiStreamingServer[Message, Message]) error
 	mustEmbedUnimplementedChittyChatServiceServer()
 }
 
@@ -65,7 +65,7 @@ type ChittyChatServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedChittyChatServiceServer struct{}
 
-func (UnimplementedChittyChatServiceServer) ChatService(grpc.BidiStreamingServer[ClientMessage, ServerMessage]) error {
+func (UnimplementedChittyChatServiceServer) ChatService(grpc.BidiStreamingServer[Message, Message]) error {
 	return status.Errorf(codes.Unimplemented, "method ChatService not implemented")
 }
 func (UnimplementedChittyChatServiceServer) mustEmbedUnimplementedChittyChatServiceServer() {}
@@ -90,11 +90,11 @@ func RegisterChittyChatServiceServer(s grpc.ServiceRegistrar, srv ChittyChatServ
 }
 
 func _ChittyChatService_ChatService_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChittyChatServiceServer).ChatService(&grpc.GenericServerStream[ClientMessage, ServerMessage]{ServerStream: stream})
+	return srv.(ChittyChatServiceServer).ChatService(&grpc.GenericServerStream[Message, Message]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChittyChatService_ChatServiceServer = grpc.BidiStreamingServer[ClientMessage, ServerMessage]
+type ChittyChatService_ChatServiceServer = grpc.BidiStreamingServer[Message, Message]
 
 // ChittyChatService_ServiceDesc is the grpc.ServiceDesc for ChittyChatService service.
 // It's only intended for direct use with grpc.RegisterService,

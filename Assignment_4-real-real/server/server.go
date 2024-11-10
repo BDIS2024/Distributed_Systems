@@ -75,7 +75,7 @@ func (s *ChittyChatServer) ChatService(stream proto.ChittyChatService_ChatServic
 }
 
 var clientNodePair proto.ChittyChatService_ChatServiceServer
-var messageStorage []proto.ClientMessage
+var messageStorage []proto.Message
 
 func retrieveMessagesFromClient(stream proto.ChittyChatService_ChatServiceServer, errorChan chan error) {
 	for {
@@ -114,14 +114,11 @@ func sendStoredMessages() {
 		for i := 0; i < len(messageStorage); i++ {
 			sendMessageToPair(&messageStorage[i])
 		}
-		messageStorage = []proto.ClientMessage{}
+		messageStorage = []proto.Message{}
 	}
 }
 
-func sendMessageToPair(message *proto.ClientMessage) {
-	msg := ServerMessage{
-		name: msg
-	}
+func sendMessageToPair(message *proto.Message) {
 	err := clientNodePair.Send(message)
 	if err != nil {
 		log.Printf("Error sending message: %v\n", message)

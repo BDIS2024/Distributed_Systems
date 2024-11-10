@@ -26,14 +26,25 @@ func main() {
 	grpcServer := grpc.NewServer()
 	proto.RegisterDmutexServiceServer(grpcServer, &DmutexServer{})
 
-	fmt.Println("Enter port number:")
-	reader := bufio.NewReader(os.Stdin)
-	port, err := reader.ReadString('\n')
-	if err != nil {
-		log.Fatal(err.Error())
+	var port string
+	// Port
+	if len(os.Args) > 1 {
+		port := os.Args[1]
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		port = strings.TrimSpace(port)
+		port = ":" + port
+	} else {
+		fmt.Println("Enter port number:")
+		reader := bufio.NewReader(os.Stdin)
+		port, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		port = strings.TrimSpace(port)
+		port = ":" + port
 	}
-	port = strings.TrimSpace(port)
-	port = ":" + port
 
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
@@ -66,7 +77,7 @@ type MessageHandler struct {
 	Clients: make(map[string]proto.DmutexService_DmutexServer),
 }*/
 
-func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
+func (s *DmutexServer) ChatService(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 
 	go retrieveMessagesFromClient(stream, errorChan)

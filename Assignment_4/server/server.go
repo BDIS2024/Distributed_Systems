@@ -44,6 +44,7 @@ func main() {
 }
 
 var counter int32 = 0
+
 type DmutexServer struct {
 	proto.UnimplementedDmutexServiceServer
 }
@@ -88,23 +89,22 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 			return
 		}
 
-		message = message
 		// HANDLE MESSAGE
 		fmt.Printf("Server - Recived message: %v\n", message)
 		var recievedTimestamp = message.Timestamp
-		counter = max(counter,recievedTimestamp) + 1
+		counter = max(counter, recievedTimestamp) + 1
 
 		if message.Message == "Connect" {
 
 			// Connect
 			clientNodePair = stream
-			fmt.Printf("Server - Formed a pair with:%v\n", clientNodePair)
+			fmt.Printf("Server - Formed a pair with:%v at Lamport time: %v \n", clientNodePair, counter)
 			sendStoredMessages()
 
 		} else {
 			// redirect message to main server
 			if clientNodePair == nil {
-				fmt.Println("Server - Recived message without pair - Storing message for later...")
+				fmt.Printf("Server - Recived message without pair at Lamport time: %v - Storing message for later...\n", counter)
 
 				messageStorage = append(messageStorage, copyMessage(message))
 
@@ -116,10 +116,15 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 }
 
 func sendStoredMessages() {
+	var latest int32 = 0
 	if len(messageStorage) > 0 {
 		for i := 0; i < len(messageStorage); i++ {
 			sendMessageToPair(&messageStorage[i])
+			if messageStorage[i].Timestamp > latest {
+				latest = messageStorage[i].Timestamp
+			}
 		}
+		counter = max(counter, latest)
 		messageStorage = []proto.Message{}
 	}
 }

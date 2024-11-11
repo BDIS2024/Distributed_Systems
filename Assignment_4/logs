@@ -12,3 +12,24 @@
 2024/11/11 13:54:28 Error: Could not send message to port 5050, port was not found
 2024/11/11 13:55:28 Error: Could not send message to port 5050, port was not found
 2024/11/11 13:55:28 Error: Could not send message to port 5051, port was not found
+2024/11/11 19:34:11 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:11 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:11 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:12 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:12 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:12 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:13 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:13 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:34:13 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:46 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:46 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:46 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:47 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:47 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:47 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:49 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:49 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:51:49 Error receiving message: rpc error: code = Canceled desc = context canceled
+2024/11/11 19:56:51 Error receiving message: rpc error: code = Unavailable desc = error reading from server: read tcp [::1]:10957->[::1]:5050: wsarecv: An existing connection was forcibly closed by the remote host.
+2024/11/11 19:56:52 Error receiving message: rpc error: code = Unavailable desc = error reading from server: read tcp [::1]:10960->[::1]:5051: wsarecv: An existing connection was forcibly closed by the remote host.
+2024/11/11 19:56:53 Error receiving message: rpc error: code = Unavailable desc = error reading from server: read tcp [::1]:10963->[::1]:5052: wsarecv: An existing connection was forcibly closed by the remote host.

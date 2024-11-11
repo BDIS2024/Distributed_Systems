@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var counter int32
+var counter int32 = 0
 var name string
 var port string
 var state = "RELEASED"
@@ -115,11 +115,14 @@ func replyRoutine() {
 			return
 		}
 		if message.Name == port {
-			log.Printf("Error recived message from self: %v", message)
+			log.Printf("Error received message from self: %v", message)
 			continue
 		}
 
 		fmt.Printf("I recived message: %v\n", message)
+
+		var recievedTimestamp = message.Timestamp
+		counter = max(counter, recievedTimestamp) + 1
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
@@ -140,7 +143,7 @@ func replyRoutine() {
 
 				// determaine who gets prio
 
-				if message.Timestamp == int32(requestTimeStamp) { // If timestamps are equal determaine by port number
+				if message.Timestamp == requestTimeStamp { // If timestamps are equal determaine by port number
 					if message.Name > port { //
 						// The other port has prio
 						sendReply(message.Name)
@@ -148,7 +151,7 @@ func replyRoutine() {
 						// We have prio
 						storedReplies = append(storedReplies, message.Name)
 					}
-				} else if message.Timestamp > int32(requestTimeStamp) { //
+				} else if message.Timestamp > requestTimeStamp { //
 					// The other port has prio
 					sendReply(message.Name)
 				} else {
@@ -182,13 +185,14 @@ func replyToStoredReplies() {
 }
 
 func sendReply(reciverPort string) {
+	counter = counter + 1
 	for i := 0; i < len(knwonNodesNode); i++ {
 		if knwonNodesNode[i].port == reciverPort { // send message
 
 			msg := proto.Message{
 				Name:      port,
 				Message:   "Reply",
-				Timestamp: getTime(),
+				Timestamp: counter,
 			}
 
 			err := knwonNodesNode[i].stream.Send(&msg)
@@ -269,14 +273,7 @@ func connectToPair() {
 	}
 }
 
-func getTime() int32 {
-	// unimplemented
-	return 1
-}
-
 func sendRequestToAllNodes() {
-	timestamp := getTime()
-	requestTimeStamp = int32(timestamp)
 
 	// init nodes
 	if len(knownNodes) > len(knwonNodesNode) {
@@ -285,10 +282,12 @@ func sendRequestToAllNodes() {
 		}
 	}
 
+	counter = counter + 1
+	requestTimeStamp = counter
 	msg := proto.Message{
 		Name:      port,
 		Message:   "Request",
-		Timestamp: timestamp,
+		Timestamp: requestTimeStamp,
 	}
 
 	// send
@@ -298,6 +297,13 @@ func sendRequestToAllNodes() {
 			log.Fatal("Error sending message:", err)
 		}
 	}
+}
+
+func max(counter int32, comparecounter int32) int32 {
+	if counter < comparecounter {
+		return comparecounter
+	}
+	return counter
 }
 
 /*

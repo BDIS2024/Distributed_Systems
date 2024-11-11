@@ -14,6 +14,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var port string
+
 func main() {
 	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
@@ -26,7 +28,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	proto.RegisterDmutexServiceServer(grpcServer, &DmutexServer{})
 
-	port := getPort()
+	port = getPort()
 
 	fmt.Printf("Setting up listener.\n")
 	listener, err := net.Listen("tcp", port)
@@ -41,6 +43,7 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Server started on %s\n", port)
+	log.Printf("Server started on %s\n", port)
 }
 
 var counter int32 = 0
@@ -91,6 +94,7 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 
 		// HANDLE MESSAGE
 		fmt.Printf("Server - Recived message: %v\n", message)
+		fmt.Printf("Server: %s - Recived message: %v\n", port, message)
 		var recievedTimestamp = message.Timestamp
 		counter = max(counter, recievedTimestamp) + 1
 
@@ -99,12 +103,14 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 			// Connect
 			clientNodePair = stream
 			fmt.Printf("Server - Formed a pair with:%v at Lamport time: %v \n", clientNodePair, counter)
+			log.Printf("Server %s - Formed a pair with:%v at Lamport time: %v \n", port, clientNodePair, counter)
 			sendStoredMessages()
 
 		} else {
 			// redirect message to main server
 			if clientNodePair == nil {
 				fmt.Printf("Server - Recived message without pair at Lamport time: %v - Storing message for later...\n", counter)
+				log.Printf("Server %s - Recived message without pair at Lamport time: %v - Storing message for later...\n", port, counter)
 
 				messageStorage = append(messageStorage, copyMessage(message))
 

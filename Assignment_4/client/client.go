@@ -98,7 +98,8 @@ func askForCriticalSection() {
 	<-hasEnoughReplies
 
 	// access critical section
-	fmt.Println("I ACCESSED THE CRITICAL SECTION")
+	fmt.Printf("%s ACCESSED THE CRITICAL SECTION %d\n", port, counter)
+	log.Printf("%s ACCESSED THE CRITICAL SECTION %d\n", port, counter)
 
 	// free the other routine
 	replyToStoredReplies()
@@ -120,6 +121,7 @@ func replyRoutine() {
 		}
 
 		fmt.Printf("I recived message: %v\n", message)
+		log.Printf("%s recived message: %v\n", port, message)
 
 		var recievedTimestamp = message.Timestamp
 		counter = max(counter, recievedTimestamp)
@@ -127,6 +129,7 @@ func replyRoutine() {
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
+				storedReplies = append(storedReplies, message.Name)
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true
@@ -177,6 +180,7 @@ var storedReplies []string
 func replyToStoredReplies() {
 
 	fmt.Printf("Replying to stored replies (%v)\n", len(storedReplies))
+	log.Printf("%s Replying to stored replies (%v) at %d\n", port, len(storedReplies), counter)
 
 	for i := 0; i < len(storedReplies); i++ {
 		sendReply(storedReplies[i])
@@ -286,7 +290,7 @@ func sendRequestToAllNodes() {
 	counter = counter + 1
 	requestTimeStamp = counter
 
-	log.Printf("%v sending request at %v", name, requestTimeStamp)
+	log.Printf("%v sending request at %v", port, requestTimeStamp)
 
 	msg := proto.Message{
 		Name:      port,

@@ -1,0 +1,9 @@
+2024/11/11 10:14:30 Client: m, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:14:50 Client: n, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:15:09 Client: a, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:27:53 Client: n, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:28:22 Client: m, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:38:04 Client: a, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:50:45 Client: m, sent message: i want to join, with timestamp: 0 to :5051 and :5052
+2024/11/11 10:51:00 Error receiving message:rpc error: code = Unavailable desc = error reading from server: read tcp [::1]:54802->[::1]:5050: wsarecv: An existing connection was forcibly closed by the remote host.
+2024/11/11 10:58:31 failed to exit idle mode: invalid target address localhost::5050, error info: address localhost::5050:443: too many colons in address

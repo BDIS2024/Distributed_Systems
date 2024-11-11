@@ -5,7 +5,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -14,15 +13,18 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var counter int32 = 0
-var name = ""
-var port = ""
-
 type Node struct {
 	stream proto.DmutexService_DmutexClient
 	conn   *grpc.ClientConn
 	port   string
 }
+
+var clientNodePair Node
+
+var knwonNodesNode []Node
+var knownNodes []string
+
+var replies int
 
 func main() {
 	//logs
@@ -31,47 +33,66 @@ func main() {
 		log.Fatalf("error opening file: %v", err)
 	}
 	defer f.Close()
-
 	log.SetOutput(f)
 
-	// set the node name
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Enter node identifier:")
-	name, err = reader.ReadString('\n')
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	name = strings.TrimSpace(name)
+	// setup peer-to-peer network
+	knownNodes = append(knownNodes, "5050")
+	knownNodes = append(knownNodes, "5051")
+	knownNodes = append(knownNodes, "5052")
 
-	// set node server port
-	fmt.Println("Enter server port:")
-	port, err = reader.ReadString('\n')
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	port = strings.TrimSpace(port)
+	// get pair port and connect
+	port := getPort()
+	clientNodePair = connectToHost(port)
+	connectToPair()
+
+	sendToAllNodes()
 
 	// get other node streams
-	node1 := connectToHost("5051")
-	node2 := connectToHost("5052")
-
-	defer node1.conn.Close()
-	defer node2.conn.Close()
-
-	message := "i want to join"
-
-	// broadcast to other nodes
-	log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
-	broadcast(message, []proto.DmutexService_DmutexClient{node1.stream, node2.stream})
+	//node1 := connectToHost("5051")
+	//node2 := connectToHost("5052")
+	//
+	//defer node1.conn.Close()
+	//defer node2.conn.Close()
+	//
+	//message := "i want to join"
+	//
+	//// broadcast to other nodes
+	//log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
+	//broadcast(message, []proto.DmutexService_DmutexClient{node1.stream, node2.stream})
 
 	waitc := make(chan bool)
-	donec := make(chan bool)
+	//donec := make(chan bool)
 
-	go retrieveMessage(waitc, donec)
+	//go retrieveMessage(waitc, donec)
 	//go sendMessage(donec, stream, msg.Name)
 
 	<-waitc
 
+}
+
+func getPort() string {
+	var port string
+	var err error
+
+	// Port
+	if len(os.Args) > 1 {
+
+		fmt.Printf("test:%v\n", os.Args[1])
+		port = os.Args[1]
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	} else {
+		fmt.Println("Enter port number:")
+		reader := bufio.NewReader(os.Stdin)
+		port, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	port = strings.TrimSpace(port)
+	return port
 }
 
 func connectToHost(host string) Node {
@@ -96,6 +117,89 @@ func connectToHost(host string) Node {
 	return node
 }
 
+func connectToPair() {
+	msg := proto.Message{
+		Name:      "",
+		Message:   "Connect",
+		Timestamp: 0,
+	}
+	clientNodePair.stream.Send(&msg)
+
+	for i := 0; i < len(knownNodes); i++ {
+		if knownNodes[i] == clientNodePair.port {
+			knownNodes = remove(knownNodes, i)
+			break
+		}
+	}
+}
+
+func getTime() int32 {
+	// unimplemented
+	return 0
+}
+
+func sendToAllNodes() {
+	// init nodes
+	if len(knownNodes) > len(knwonNodesNode) {
+		for i := 0; i < len(knownNodes); i++ {
+			knwonNodesNode = append(knwonNodesNode, connectToHost(knownNodes[i]))
+		}
+	}
+
+	msg := proto.Message{
+		Name:      "",
+		Message:   "Request",
+		Timestamp: getTime(),
+	}
+
+	// send
+	for i := 0; i < len(knwonNodesNode); i++ {
+		err := knwonNodesNode[i].stream.Send(&msg)
+		if err != nil {
+			log.Fatal("Error sending message:", err)
+		}
+	}
+}
+
+/*
+func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, username string) {
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		message, err := reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		message = strings.TrimSpace(message)
+
+		if message == "leave" {
+			err = stream.Send(&proto.Message{
+				Name:      username,
+				Message:   "has left the chat.",
+				Timestamp: counter,
+			})
+			if err != nil {
+				log.Fatal(err.Error())
+			}
+			err = stream.CloseSend()
+			if err != nil {
+				log.Fatal("Error closing stream:", err)
+			}
+
+			donec <- true
+			return
+		}
+		counter++
+
+		msg := proto.Message{
+			Name:      username,
+			Message:   message,
+			Timestamp: counter,
+		}
+
+		log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
+	}
+}*/
+/*
 func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
 	msg := proto.Message{
 		Name:      name,
@@ -137,50 +241,15 @@ func retrieveMessage(waitc chan bool, donec chan bool) {
 	}
 }
 
-func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, username string) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		message, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		message = strings.TrimSpace(message)
-
-		if message == "leave" {
-			err = stream.Send(&proto.Message{
-				Name:      username,
-				Message:   "has left the chat.",
-				Timestamp: counter,
-			})
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			err = stream.CloseSend()
-			if err != nil {
-				log.Fatal("Error closing stream:", err)
-			}
-
-			donec <- true
-			return
-		}
-		counter++
-
-		msg := proto.Message{
-			Name:      username,
-			Message:   message,
-			Timestamp: counter,
-		}
-		err = stream.Send(&msg)
-		if err != nil {
-			log.Fatal("Error sending message:", err)
-		}
-		log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
-	}
-}
-
 func max(counter int32, comparecounter int32) int32 {
 	if counter < comparecounter {
 		return comparecounter
 	}
 	return counter
+} */
+
+// https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang
+func remove(s []string, i int) []string {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }

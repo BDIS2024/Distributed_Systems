@@ -26,36 +26,21 @@ func main() {
 	grpcServer := grpc.NewServer()
 	proto.RegisterDmutexServiceServer(grpcServer, &DmutexServer{})
 
-	var port string
-	// Port
-	if len(os.Args) > 1 {
-		port = os.Args[1]
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		port = strings.TrimSpace(port)
-		port = ":" + port
-	} else {
-		fmt.Println("Enter port number:")
-		reader := bufio.NewReader(os.Stdin)
-		port, err = reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		port = strings.TrimSpace(port)
-		port = ":" + port
-	}
+	port := getPort()
 
+	fmt.Printf("Setting up listener.\n")
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
+		fmt.Println(err)
 		log.Fatal(err)
 	}
 
+	fmt.Printf("Serving port\n")
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Server started on %s", port)
+	fmt.Printf("Server started on %s\n", port)
 }
 
 type DmutexServer struct {
@@ -102,7 +87,7 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 		}
 		// HANDLE MESSAGE
 		fmt.Printf("Recived message: %v\n", message)
-		if message.Name == "Connect" {
+		if message.Message == "Connect" {
 
 			// Connect
 			clientNodePair = stream
@@ -136,6 +121,32 @@ func sendMessageToPair(message *proto.Message) {
 	} else {
 		fmt.Printf("Sucessfully sent message: %v\n", message)
 	}
+}
+
+func getPort() string {
+	var port string
+	var err error
+
+	// Port
+	if len(os.Args) > 1 {
+
+		fmt.Printf("test:%v\n", os.Args[1])
+		port = os.Args[1]
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	} else {
+		fmt.Println("Enter port number:")
+		reader := bufio.NewReader(os.Stdin)
+		port, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	port = strings.TrimSpace(port)
+	port = ":" + port
+	return port
 }
 
 /*

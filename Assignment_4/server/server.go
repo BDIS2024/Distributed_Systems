@@ -86,18 +86,18 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 			return
 		}
 		// HANDLE MESSAGE
-		fmt.Printf("Recived message: %v\n", message)
+		fmt.Printf("Server - Recived message: %v\n", message)
 		if message.Message == "Connect" {
 
 			// Connect
 			clientNodePair = stream
-			fmt.Printf("Formed a pair with:%v\n", clientNodePair)
+			fmt.Printf("Server - Formed a pair with:%v\n", clientNodePair)
 			sendStoredMessages()
 
 		} else {
 			// redirect message to main server
 			if clientNodePair == nil {
-				fmt.Println("Recived message without pair - Storing message for later...")
+				fmt.Println("Server - Recived message without pair - Storing message for later...")
 			} else {
 				sendMessageToPair(message)
 			}

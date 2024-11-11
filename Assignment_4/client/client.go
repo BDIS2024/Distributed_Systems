@@ -29,8 +29,6 @@ var clientNodePair Node
 var knwonNodesNode []Node
 var knownNodes []string
 
-var replies int
-
 func main() {
 	//logs
 	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
@@ -46,11 +44,17 @@ func main() {
 	knownNodes = append(knownNodes, "5052")
 
 	// get pair port and connect
-	port := getPort()
+	port = getPort()
 	clientNodePair = connectToHost(port)
 	connectToPair()
 
-	sendToAllNodes()
+	replies = 0
+	hasEnoughReplies = make(chan bool, 1)
+	requestingCriticalSection = make(chan bool, 1)
+
+	go replyRoutine()
+
+	askForCriticalSection()
 
 	// get other node streams
 	//node1 := connectToHost("5051")
@@ -73,6 +77,133 @@ func main() {
 
 	<-waitc
 
+}
+
+var hasEnoughReplies chan bool
+var requestingCriticalSection chan bool
+
+var replies int
+var requestTimeStamp int32
+
+func isRequestingCriticalSection() bool {
+	return len(requestingCriticalSection) >= 1
+}
+
+func askForCriticalSection() {
+
+	sendRequestToAllNodes()
+
+	requestingCriticalSection <- true
+
+	<-hasEnoughReplies
+
+	// access critical section
+	fmt.Println("I ACCESSED THE CRITICAL SECTION")
+
+	// free the other routine
+	replyToStoredReplies()
+	<-requestingCriticalSection
+	hasEnoughReplies <- true
+
+}
+
+func replyRoutine() {
+	for {
+		message, err := clientNodePair.stream.Recv()
+		if err != nil {
+			log.Printf("Error receiving message: %v", err)
+			return
+		}
+		if message.Name == port {
+			log.Printf("Error recived message from self: %v", message)
+			continue
+		}
+
+		fmt.Printf("I recived message: %v\n", message)
+
+		if message.Message == "Reply" {
+			if isRequestingCriticalSection() {
+				replies++
+				if replies >= len(knownNodes) { // check if we got enough replies
+					hasEnoughReplies <- true
+					replies = 0
+					<-hasEnoughReplies // "lock" this method temporarily while we acces critical section so we dont send stored replies and then at the same time add another element to the array
+				}
+
+			} else { // we should not be getting this message
+				log.Printf("Error recived unexpected message: %v", message)
+				continue
+			}
+		} else if message.Message == "Request" {
+			// Main logic for algorythm
+			if isRequestingCriticalSection() {
+
+				// determaine who gets prio
+
+				if message.Timestamp == int32(requestTimeStamp) { // If timestamps are equal determaine by port number
+					if message.Name > port { //
+						// The other port has prio
+						sendReply(message.Name)
+					} else {
+						// We have prio
+						storedReplies = append(storedReplies, message.Name)
+					}
+				} else if message.Timestamp > int32(requestTimeStamp) { //
+					// The other port has prio
+					sendReply(message.Name)
+				} else {
+					// We have prio
+					storedReplies = append(storedReplies, message.Name)
+				}
+
+			} else {
+				sendReply(message.Name)
+			}
+
+		} else { // we should not be getting this message
+			log.Printf("Error recived unknown message: %v\n", message)
+			continue
+		}
+
+	}
+}
+
+var storedReplies []string
+
+func replyToStoredReplies() {
+
+	fmt.Printf("Replying to stored replies (%v)\n", len(storedReplies))
+
+	for i := 0; i < len(storedReplies); i++ {
+		sendReply(storedReplies[i])
+	}
+
+	storedReplies = []string{}
+}
+
+func sendReply(reciverPort string) {
+	for i := 0; i < len(knwonNodesNode); i++ {
+		if knwonNodesNode[i].port == reciverPort { // send message
+
+			msg := proto.Message{
+				Name:      port,
+				Message:   "Reply",
+				Timestamp: getTime(),
+			}
+
+			err := knwonNodesNode[i].stream.Send(&msg)
+			if err != nil {
+				log.Fatal("Error sending message:", err)
+			} else {
+				fmt.Printf("I sent message: %v\n", msg)
+				return
+			}
+		}
+	}
+
+	// could not find port
+	log.Printf("Error: Could not send message to port %v, port was not found\n", port)
+	fmt.Printf("Error: Could not send message to port %v, port was not found\n", port)
 }
 
 func getPort() string {
@@ -140,10 +271,13 @@ func connectToPair() {
 
 func getTime() int32 {
 	// unimplemented
-	return 0
+	return 1
 }
 
-func sendToAllNodes() {
+func sendRequestToAllNodes() {
+	timestamp := getTime()
+	requestTimeStamp = int32(timestamp)
+
 	// init nodes
 	if len(knownNodes) > len(knwonNodesNode) {
 		for i := 0; i < len(knownNodes); i++ {
@@ -152,9 +286,9 @@ func sendToAllNodes() {
 	}
 
 	msg := proto.Message{
-		Name:      "",
+		Name:      port,
 		Message:   "Request",
-		Timestamp: getTime(),
+		Timestamp: timestamp,
 	}
 
 	// send

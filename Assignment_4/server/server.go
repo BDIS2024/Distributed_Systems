@@ -65,6 +65,7 @@ type MessageHandler struct {
 
 func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
+	messageStorage = []proto.Message{}
 
 	go retrieveMessagesFromClient(stream, errorChan)
 
@@ -86,8 +87,10 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 			errorChan <- err
 			return
 		}
+
+		message = message
 		// HANDLE MESSAGE
-		fmt.Printf("Recived message: %v\n", message)
+		fmt.Printf("Server - Recived message: %v\n", message)
 		var recievedTimestamp = message.Timestamp
 		counter = max(counter,recievedTimestamp) + 1
 
@@ -95,13 +98,16 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 
 			// Connect
 			clientNodePair = stream
-			fmt.Printf("Formed a pair with:%v\n", clientNodePair)
+			fmt.Printf("Server - Formed a pair with:%v\n", clientNodePair)
 			sendStoredMessages()
 
 		} else {
 			// redirect message to main server
 			if clientNodePair == nil {
-				fmt.Println("Recived message without pair - Storing message for later...")
+				fmt.Println("Server - Recived message without pair - Storing message for later...")
+
+				messageStorage = append(messageStorage, copyMessage(message))
+
 			} else {
 				sendMessageToPair(message)
 			}
@@ -115,6 +121,14 @@ func sendStoredMessages() {
 			sendMessageToPair(&messageStorage[i])
 		}
 		messageStorage = []proto.Message{}
+	}
+}
+
+func copyMessage(arg *proto.Message) proto.Message {
+	return proto.Message{
+		Name:      arg.Name,
+		Message:   arg.Message,
+		Timestamp: arg.Timestamp,
 	}
 }
 

@@ -127,8 +127,6 @@ func replyRoutine() {
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
-				storedReplies = append(storedReplies, message.Name)
-
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true

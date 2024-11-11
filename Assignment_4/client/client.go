@@ -122,10 +122,13 @@ func replyRoutine() {
 		fmt.Printf("I recived message: %v\n", message)
 
 		var recievedTimestamp = message.Timestamp
-		counter = max(counter, recievedTimestamp) + 1
+		counter = max(counter, recievedTimestamp)
+		counter = counter + 1
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
+				storedReplies = append(storedReplies, message.Name)
+
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true
@@ -199,7 +202,7 @@ func sendReply(reciverPort string) {
 			if err != nil {
 				log.Fatal("Error sending message:", err)
 			} else {
-				fmt.Printf("I sent message: %v\n", msg)
+				fmt.Printf("I sent message: Name:%v message:%v Timestamp: %v\n", msg.Name, msg.Message, msg.Timestamp)
 				return
 			}
 		}
@@ -284,6 +287,9 @@ func sendRequestToAllNodes() {
 
 	counter = counter + 1
 	requestTimeStamp = counter
+
+	log.Printf("%v sending request at %v", name, requestTimeStamp)
+
 	msg := proto.Message{
 		Name:      port,
 		Message:   "Request",

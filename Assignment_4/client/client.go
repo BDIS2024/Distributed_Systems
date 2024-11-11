@@ -172,7 +172,7 @@ var storedReplies []string
 
 func replyToStoredReplies() {
 
-	fmt.Printf("Replying to stored replies (%v)/n", len(storedReplies))
+	fmt.Printf("Replying to stored replies (%v)\n", len(storedReplies))
 
 	for i := 0; i < len(storedReplies); i++ {
 		sendReply(storedReplies[i])

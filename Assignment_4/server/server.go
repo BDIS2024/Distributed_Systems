@@ -43,6 +43,7 @@ func main() {
 	fmt.Printf("Server started on %s\n", port)
 }
 
+var counter int32 = 0
 type DmutexServer struct {
 	proto.UnimplementedDmutexServiceServer
 }
@@ -87,6 +88,9 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 		}
 		// HANDLE MESSAGE
 		fmt.Printf("Recived message: %v\n", message)
+		var recievedTimestamp = message.Timestamp
+		counter = max(counter,recievedTimestamp) + 1
+
 		if message.Message == "Connect" {
 
 			// Connect
@@ -147,6 +151,13 @@ func getPort() string {
 	port = strings.TrimSpace(port)
 	port = ":" + port
 	return port
+}
+
+func max(counter int32, comparecounter int32) int32 {
+	if counter < comparecounter {
+		return comparecounter
+	}
+	return counter
 }
 
 /*

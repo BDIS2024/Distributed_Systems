@@ -14,9 +14,10 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var counter int32 = 0
-var name = ""
-var port = ""
+var counter int32
+var name string
+var port string
+var state = "RELEASED"
 
 type Node struct {
 	stream proto.DmutexService_DmutexClient

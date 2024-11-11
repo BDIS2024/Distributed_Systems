@@ -13,10 +13,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var counter int32
-var name string
+var counter int32 = 0
 var port string
-var state = "RELEASED"
 
 type Node struct {
 	stream proto.DmutexService_DmutexClient
@@ -56,24 +54,7 @@ func main() {
 
 	askForCriticalSection()
 
-	// get other node streams
-	//node1 := connectToHost("5051")
-	//node2 := connectToHost("5052")
-	//
-	//defer node1.conn.Close()
-	//defer node2.conn.Close()
-	//
-	//message := "i want to join"
-	//
-	//// broadcast to other nodes
-	//log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
-	//broadcast(message, []proto.DmutexService_DmutexClient{node1.stream, node2.stream})
-
 	waitc := make(chan bool)
-	//donec := make(chan bool)
-
-	//go retrieveMessage(waitc, donec)
-	//go sendMessage(donec, stream, msg.Name)
 
 	<-waitc
 
@@ -98,7 +79,8 @@ func askForCriticalSection() {
 	<-hasEnoughReplies
 
 	// access critical section
-	fmt.Println("I ACCESSED THE CRITICAL SECTION")
+	fmt.Printf("%s ACCESSED THE CRITICAL SECTION AT LAMPORT TIMESTAMP: %d\n", port, counter)
+	log.Printf("%s ACCESSED THE CRITICAL SECTION %d\n", port, counter)
 
 	// free the other routine
 	replyToStoredReplies()
@@ -115,14 +97,20 @@ func replyRoutine() {
 			return
 		}
 		if message.Name == port {
-			log.Printf("Error recived message from self: %v", message)
+			log.Printf("Error received message from self: %v", message)
 			continue
 		}
 
 		fmt.Printf("I recived message: %v\n", message)
+		log.Printf("%s recived message: %v\n", port, message)
+
+		var recievedTimestamp = message.Timestamp
+		counter = max(counter, recievedTimestamp)
+		counter = counter + 1
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
+				//storedReplies = append(storedReplies, message.Name) Remove // if not working
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true
@@ -138,9 +126,9 @@ func replyRoutine() {
 			// Main logic for algorythm
 			if isRequestingCriticalSection() {
 
-				// determaine who gets prio
+				// determine who gets prio
 
-				if message.Timestamp == int32(requestTimeStamp) { // If timestamps are equal determaine by port number
+				if message.Timestamp == requestTimeStamp { // If timestamps are equal determaine by port number
 					if message.Name > port { //
 						// The other port has prio
 						sendReply(message.Name)
@@ -148,7 +136,7 @@ func replyRoutine() {
 						// We have prio
 						storedReplies = append(storedReplies, message.Name)
 					}
-				} else if message.Timestamp > int32(requestTimeStamp) { //
+				} else if message.Timestamp > requestTimeStamp { //
 					// The other port has prio
 					sendReply(message.Name)
 				} else {
@@ -173,6 +161,7 @@ var storedReplies []string
 func replyToStoredReplies() {
 
 	fmt.Printf("Replying to stored replies (%v)\n", len(storedReplies))
+	log.Printf("%s Replying to stored replies (%v) at %d\n", port, len(storedReplies), counter)
 
 	for i := 0; i < len(storedReplies); i++ {
 		sendReply(storedReplies[i])
@@ -182,20 +171,21 @@ func replyToStoredReplies() {
 }
 
 func sendReply(reciverPort string) {
+	counter = counter + 1
 	for i := 0; i < len(knwonNodesNode); i++ {
 		if knwonNodesNode[i].port == reciverPort { // send message
 
 			msg := proto.Message{
 				Name:      port,
 				Message:   "Reply",
-				Timestamp: getTime(),
+				Timestamp: counter,
 			}
 
 			err := knwonNodesNode[i].stream.Send(&msg)
 			if err != nil {
 				log.Fatal("Error sending message:", err)
 			} else {
-				fmt.Printf("I sent message: %v\n", msg)
+				fmt.Printf("I sent message: Name:%v message:%v Timestamp: %v\n", msg.Name, msg.Message, msg.Timestamp)
 				return
 			}
 		}
@@ -269,14 +259,7 @@ func connectToPair() {
 	}
 }
 
-func getTime() int32 {
-	// unimplemented
-	return 1
-}
-
 func sendRequestToAllNodes() {
-	timestamp := getTime()
-	requestTimeStamp = int32(timestamp)
 
 	// init nodes
 	if len(knownNodes) > len(knwonNodesNode) {
@@ -285,10 +268,15 @@ func sendRequestToAllNodes() {
 		}
 	}
 
+	counter = counter + 1
+	requestTimeStamp = counter
+
+	log.Printf("%v sending request at %v", port, requestTimeStamp)
+
 	msg := proto.Message{
 		Name:      port,
 		Message:   "Request",
-		Timestamp: timestamp,
+		Timestamp: requestTimeStamp,
 	}
 
 	// send
@@ -300,92 +288,13 @@ func sendRequestToAllNodes() {
 	}
 }
 
-/*
-func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, username string) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		message, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		message = strings.TrimSpace(message)
-
-		if message == "leave" {
-			err = stream.Send(&proto.Message{
-				Name:      username,
-				Message:   "has left the chat.",
-				Timestamp: counter,
-			})
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			err = stream.CloseSend()
-			if err != nil {
-				log.Fatal("Error closing stream:", err)
-			}
-
-			donec <- true
-			return
-		}
-		counter++
-
-		msg := proto.Message{
-			Name:      username,
-			Message:   message,
-			Timestamp: counter,
-		}
-
-		log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
-	}
-}*/
-/*
-func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
-	msg := proto.Message{
-		Name:      name,
-		Message:   message,
-		Timestamp: counter,
-	}
-
-	for _, node := range nodes {
-		err := node.Send(&msg)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-}
-
-func retrieveMessage(waitc chan bool, donec chan bool) {
-	self := connectToHost(port)
-
-	for {
-		select {
-		case <-donec:
-			waitc <- true
-			return
-		default:
-			in, err := self.stream.Recv()
-			if err == io.EOF {
-				waitc <- true
-				return
-			}
-			if err != nil {
-				log.Fatal("Error receiving message:", err)
-				waitc <- true
-				return
-			}
-			counter = max(counter, in.Timestamp) + 1
-
-			log.Printf("Client recieved response: Name: %s, Message: %s, Timestamp: (%d) at: %d\n", in.Name, in.Message, in.Timestamp, counter)
-		}
-	}
-}
-
 func max(counter int32, comparecounter int32) int32 {
 	if counter < comparecounter {
 		return comparecounter
 	}
 	return counter
-} */
+}
+
 
 // https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang
 func remove(s []string, i int) []string {

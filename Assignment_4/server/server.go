@@ -63,10 +63,6 @@ type MessageHandler struct {
 	Lock    sync.Mutex
 }
 
-/*var handler = MessageHandler{
-	Clients: make(map[string]proto.DmutexService_DmutexServer),
-}*/
-
 func (s *DmutexServer) Dmutex(stream proto.DmutexService_DmutexServer) error {
 	errorChan := make(chan error)
 	messageStorage = []proto.Message{}
@@ -184,17 +180,3 @@ func max(counter int32, comparecounter int32) int32 {
 	}
 	return counter
 }
-
-/*
-
-	var inCriticalSection = false
-var replies = 0
-		if message.Name == "Request" {
-
-
-			if inCriticalSection {
-				// Add client to "reply list"
-			}
-		} else if message.Name == "Reply" {
-			// Send message to
-		}*/

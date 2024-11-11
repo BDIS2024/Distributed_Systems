@@ -14,9 +14,7 @@ import (
 )
 
 var counter int32 = 0
-var name string
 var port string
-var state = "RELEASED"
 
 type Node struct {
 	stream proto.DmutexService_DmutexClient
@@ -56,24 +54,7 @@ func main() {
 
 	askForCriticalSection()
 
-	// get other node streams
-	//node1 := connectToHost("5051")
-	//node2 := connectToHost("5052")
-	//
-	//defer node1.conn.Close()
-	//defer node2.conn.Close()
-	//
-	//message := "i want to join"
-	//
-	//// broadcast to other nodes
-	//log.Printf("Client: %s, sent message: %s, with timestamp: %d to :%s and :%s\n", name, message, counter, node1.port, node2.port)
-	//broadcast(message, []proto.DmutexService_DmutexClient{node1.stream, node2.stream})
-
 	waitc := make(chan bool)
-	//donec := make(chan bool)
-
-	//go retrieveMessage(waitc, donec)
-	//go sendMessage(donec, stream, msg.Name)
 
 	<-waitc
 
@@ -98,7 +79,7 @@ func askForCriticalSection() {
 	<-hasEnoughReplies
 
 	// access critical section
-	fmt.Printf("%s ACCESSED THE CRITICAL SECTION %d\n", port, counter)
+	fmt.Printf("%s ACCESSED THE CRITICAL SECTION AT LAMPORT TIMESTAMP: %d\n", port, counter)
 	log.Printf("%s ACCESSED THE CRITICAL SECTION %d\n", port, counter)
 
 	// free the other routine
@@ -129,6 +110,7 @@ func replyRoutine() {
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
+				//storedReplies = append(storedReplies, message.Name) Remove // if not working
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true
@@ -144,7 +126,7 @@ func replyRoutine() {
 			// Main logic for algorythm
 			if isRequestingCriticalSection() {
 
-				// determaine who gets prio
+				// determine who gets prio
 
 				if message.Timestamp == requestTimeStamp { // If timestamps are equal determaine by port number
 					if message.Name > port { //
@@ -313,92 +295,6 @@ func max(counter int32, comparecounter int32) int32 {
 	return counter
 }
 
-/*
-func sendMessage(donec chan bool, stream proto.DmutexService_DmutexClient, username string) {
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		message, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-		message = strings.TrimSpace(message)
-
-		if message == "leave" {
-			err = stream.Send(&proto.Message{
-				Name:      username,
-				Message:   "has left the chat.",
-				Timestamp: counter,
-			})
-			if err != nil {
-				log.Fatal(err.Error())
-			}
-			err = stream.CloseSend()
-			if err != nil {
-				log.Fatal("Error closing stream:", err)
-			}
-
-			donec <- true
-			return
-		}
-		counter++
-
-		msg := proto.Message{
-			Name:      username,
-			Message:   message,
-			Timestamp: counter,
-		}
-
-		log.Printf("Client sent request: Name: %s, Message: %s, Timestamp: (%d)\n", msg.Name, msg.Message, counter)
-	}
-}*/
-/*
-func broadcast(message string, nodes []proto.DmutexService_DmutexClient) {
-	msg := proto.Message{
-		Name:      name,
-		Message:   message,
-		Timestamp: counter,
-	}
-
-	for _, node := range nodes {
-		err := node.Send(&msg)
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-	}
-}
-
-func retrieveMessage(waitc chan bool, donec chan bool) {
-	self := connectToHost(port)
-
-	for {
-		select {
-		case <-donec:
-			waitc <- true
-			return
-		default:
-			in, err := self.stream.Recv()
-			if err == io.EOF {
-				waitc <- true
-				return
-			}
-			if err != nil {
-				log.Fatal("Error receiving message:", err)
-				waitc <- true
-				return
-			}
-			counter = max(counter, in.Timestamp) + 1
-
-			log.Printf("Client recieved response: Name: %s, Message: %s, Timestamp: (%d) at: %d\n", in.Name, in.Message, in.Timestamp, counter)
-		}
-	}
-}
-
-func max(counter int32, comparecounter int32) int32 {
-	if counter < comparecounter {
-		return comparecounter
-	}
-	return counter
-} */
 
 // https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang
 func remove(s []string, i int) []string {

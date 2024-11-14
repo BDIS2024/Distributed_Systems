@@ -1,30 +1,150 @@
-2024/11/11 23:12:40 Server :5050 - Formed a pair with:&{0x140001a63c0} at Lamport time: 1 
-2024/11/11 23:12:40 5050 sending request at 1
-2024/11/11 23:12:40 Server :5052 - Recived message without pair at Lamport time: 2 - Storing message for later...
-2024/11/11 23:12:40 Server :5051 - Recived message without pair at Lamport time: 2 - Storing message for later...
-2024/11/11 23:12:41 Server :5051 - Formed a pair with:&{0x140002a8000} at Lamport time: 3 
-2024/11/11 23:12:41 5051 sending request at 1
-2024/11/11 23:12:41 Server :5052 - Recived message without pair at Lamport time: 3 - Storing message for later...
-2024/11/11 23:12:41 5050 recived message: name:"5051"  message:"Request"  timestamp:1
-2024/11/11 23:12:41 5051 recived message: name:"5050"  message:"Reply"  timestamp:3
-2024/11/11 23:12:42 Server :5052 - Formed a pair with:&{0x14000130690} at Lamport time: 4 
-2024/11/11 23:12:42 5052 sending request at 1
-2024/11/11 23:12:42 5051 recived message: name:"5052"  message:"Request"  timestamp:1
-2024/11/11 23:12:42 5050 recived message: name:"5052"  message:"Request"  timestamp:1
-2024/11/11 23:12:42 5052 recived message: name:"5050"  message:"Reply"  timestamp:5
-2024/11/11 23:12:42 5052 recived message: name:"5051"  message:"Reply"  timestamp:6
-2024/11/11 23:12:42 5052 ACCESSED THE CRITICAL SECTION 7
-2024/11/11 23:12:42 5052 Replying to stored replies (2) at 7
-2024/11/11 23:12:42 5051 recived message: name:"5052"  message:"Reply"  timestamp:9
-2024/11/11 23:12:42 5051 ACCESSED THE CRITICAL SECTION 10
-2024/11/11 23:12:42 5051 Replying to stored replies (2) at 10
-2024/11/11 23:12:42 5050 recived message: name:"5052"  message:"Reply"  timestamp:8
-2024/11/11 23:12:42 5050 recived message: name:"5051"  message:"Reply"  timestamp:11
-2024/11/11 23:12:42 5050 ACCESSED THE CRITICAL SECTION 12
-2024/11/11 23:12:42 5050 Replying to stored replies (2) at 12
-2024/11/11 23:12:42 5051 recived message: name:"5050"  message:"Reply"  timestamp:14
-2024/11/11 23:12:42 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:14
-2024/11/11 23:12:42 5052 recived message: name:"5050"  message:"Reply"  timestamp:13
-2024/11/11 23:12:42 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:13
-2024/11/11 23:12:42 5052 recived message: name:"5051"  message:"Reply"  timestamp:12
-2024/11/11 23:12:42 Error recived unexpected message: name:"5051"  message:"Reply"  timestamp:12
+2024/11/11 23:41:11 Server: :5050 - Recived message: message:"Connect"
+2024/11/11 23:41:11 Server :5050 - Formed a pair with:&{0x140000d0000} at Lamport time: 1 
+2024/11/11 23:41:11 5050 sending request at 1
+2024/11/11 23:41:11 Server: :5052 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:41:11 Server :5052 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:41:11 Server: :5051 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:41:11 Server :5051 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:41:11 Server: :5051 - Recived message: message:"Connect"
+2024/11/11 23:41:11 Server :5051 - Formed a pair with:&{0x140000c8000} at Lamport time: 3 
+2024/11/11 23:41:11 5051 sending request at 1
+2024/11/11 23:41:11 Server: :5052 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:41:11 Server :5052 - Recived message without pair at Lamport time: 3 - Storing message for later...
+2024/11/11 23:41:11 Server: :5050 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:41:11 5050 recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:41:11 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:3
+2024/11/11 23:41:11 5051 recived message: name:"5050" message:"Reply" timestamp:3
+2024/11/11 23:41:12 Server: :5052 - Recived message: message:"Connect"
+2024/11/11 23:41:12 Server :5052 - Formed a pair with:&{0x140000d03c0} at Lamport time: 4 
+2024/11/11 23:41:12 5052 sending request at 1
+2024/11/11 23:41:12 Server: :5051 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:41:12 Server: :5050 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:41:12 5051 recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:41:12 5050 recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:41:12 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:6
+2024/11/11 23:41:12 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:5
+2024/11/11 23:41:12 5052 recived message: name:"5051" message:"Reply" timestamp:6
+2024/11/11 23:41:12 5052 recived message: name:"5050" message:"Reply" timestamp:5
+2024/11/11 23:41:12 5052 ACCESSED THE CRITICAL SECTION 8
+2024/11/11 23:41:12 5052 Replying to stored replies (2) at 8
+2024/11/11 23:41:12 Server: :5051 - Recived message: name:"5052" message:"Reply" timestamp:9
+2024/11/11 23:41:12 Server: :5050 - Recived message: name:"5052" message:"Reply" timestamp:10
+2024/11/11 23:41:12 5051 recived message: name:"5052" message:"Reply" timestamp:9
+2024/11/11 23:41:12 5050 recived message: name:"5052" message:"Reply" timestamp:10
+2024/11/11 23:41:12 5051 ACCESSED THE CRITICAL SECTION 10
+2024/11/11 23:41:12 5051 Replying to stored replies (2) at 10
+2024/11/11 23:41:12 Server: :5050 - Recived message: name:"5051" message:"Reply" timestamp:11
+2024/11/11 23:41:12 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:12
+2024/11/11 23:41:12 5050 recived message: name:"5051" message:"Reply" timestamp:11
+2024/11/11 23:41:12 5050 ACCESSED THE CRITICAL SECTION 12
+2024/11/11 23:41:12 5050 Replying to stored replies (2) at 12
+2024/11/11 23:41:12 5052 recived message: name:"5051" message:"Reply" timestamp:12
+2024/11/11 23:41:12 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:13
+2024/11/11 23:41:12 Error recived unexpected message: name:"5051" message:"Reply" timestamp:12
+2024/11/11 23:41:12 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:14
+2024/11/11 23:41:12 5052 recived message: name:"5050" message:"Reply" timestamp:13
+2024/11/11 23:41:12 Error recived unexpected message: name:"5050" message:"Reply" timestamp:13
+2024/11/11 23:41:12 5051 recived message: name:"5050" message:"Reply" timestamp:14
+2024/11/11 23:41:12 Error recived unexpected message: name:"5050" message:"Reply" timestamp:14
+2024/11/11 23:46:41 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:46:42 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:46:43 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:47:01 Server: :5050 - Recived message: message:"Connect"
+2024/11/11 23:47:01 Server :5050 - Formed a pair with:&{0x140001a63c0} at Lamport time: 1 
+2024/11/11 23:47:01 5050 sending request at 1
+2024/11/11 23:47:01 Server: :5052 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:47:01 Server: :5051 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:47:01 Server :5052 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:47:01 Server :5051 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:47:03 Server: :5051 - Recived message: message:"Connect"
+2024/11/11 23:47:03 Server :5051 - Formed a pair with:&{0x1400028e000} at Lamport time: 3 
+2024/11/11 23:47:03 5051 sending request at 1
+2024/11/11 23:47:03 Server: :5052 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:47:03 Server :5052 - Recived message without pair at Lamport time: 3 - Storing message for later...
+2024/11/11 23:47:03 Server: :5050 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:47:03 5050 recived message: name:"5051"  message:"Request"  timestamp:1
+2024/11/11 23:47:03 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:3
+2024/11/11 23:47:03 5051 recived message: name:"5050"  message:"Reply"  timestamp:3
+2024/11/11 23:47:04 Server: :5052 - Recived message: message:"Connect"
+2024/11/11 23:47:04 Server :5052 - Formed a pair with:&{0x140001c21e0} at Lamport time: 4 
+2024/11/11 23:47:04 5052 sending request at 1
+2024/11/11 23:47:04 Server: :5051 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:47:04 Server: :5050 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:47:04 5051 recived message: name:"5052"  message:"Request"  timestamp:1
+2024/11/11 23:47:04 5050 recived message: name:"5052"  message:"Request"  timestamp:1
+2024/11/11 23:47:04 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:6
+2024/11/11 23:47:04 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:5
+2024/11/11 23:47:04 5052 recived message: name:"5051"  message:"Reply"  timestamp:6
+2024/11/11 23:47:04 5052 recived message: name:"5050"  message:"Reply"  timestamp:5
+2024/11/11 23:47:04 5052 ACCESSED THE CRITICAL SECTION 8
+2024/11/11 23:47:04 5052 Replying to stored replies (2) at 8
+2024/11/11 23:47:04 Server: :5050 - Recived message: name:"5052" message:"Reply" timestamp:10
+2024/11/11 23:47:04 Server: :5051 - Recived message: name:"5052" message:"Reply" timestamp:9
+2024/11/11 23:47:04 5050 recived message: name:"5052"  message:"Reply"  timestamp:10
+2024/11/11 23:47:04 5051 recived message: name:"5052"  message:"Reply"  timestamp:9
+2024/11/11 23:47:04 5051 ACCESSED THE CRITICAL SECTION 10
+2024/11/11 23:47:04 5051 Replying to stored replies (2) at 10
+2024/11/11 23:47:04 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:12
+2024/11/11 23:47:04 Server: :5050 - Recived message: name:"5051" message:"Reply" timestamp:11
+2024/11/11 23:47:04 5052 recived message: name:"5051"  message:"Reply"  timestamp:12
+2024/11/11 23:47:04 Error recived unexpected message: name:"5051"  message:"Reply"  timestamp:12
+2024/11/11 23:47:04 5050 recived message: name:"5051"  message:"Reply"  timestamp:11
+2024/11/11 23:47:04 5050 ACCESSED THE CRITICAL SECTION 12
+2024/11/11 23:47:04 5050 Replying to stored replies (2) at 12
+2024/11/11 23:47:04 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:13
+2024/11/11 23:47:04 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:14
+2024/11/11 23:47:04 5052 recived message: name:"5050"  message:"Reply"  timestamp:13
+2024/11/11 23:47:04 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:13
+2024/11/11 23:47:04 5051 recived message: name:"5050"  message:"Reply"  timestamp:14
+2024/11/11 23:47:04 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:14
+2024/11/11 23:48:32 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:48:33 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:48:33 Error receiving message: rpc error: code = Unavailable desc = error reading from server: EOF
+2024/11/11 23:48:59 Server: :5050 - Recived message: message:"Connect"
+2024/11/11 23:48:59 Server :5050 - Formed a pair with:&{0x140001303c0} at Lamport time: 1 
+2024/11/11 23:48:59 5050 sending request at 1
+2024/11/11 23:48:59 Server: :5052 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:48:59 Server :5052 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:48:59 Server: :5051 - Recived message: name:"5050" message:"Request" timestamp:1
+2024/11/11 23:48:59 Server :5051 - Recived message without pair at Lamport time: 2 - Storing message for later...
+2024/11/11 23:49:00 Server: :5051 - Recived message: message:"Connect"
+2024/11/11 23:49:00 Server :5051 - Formed a pair with:&{0x140000c2000} at Lamport time: 3 
+2024/11/11 23:49:00 5051 sending request at 1
+2024/11/11 23:49:00 Server: :5052 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:49:00 Server: :5050 - Recived message: name:"5051" message:"Request" timestamp:1
+2024/11/11 23:49:00 Server :5052 - Recived message without pair at Lamport time: 3 - Storing message for later...
+2024/11/11 23:49:00 5050 recived message: name:"5051"  message:"Request"  timestamp:1
+2024/11/11 23:49:00 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:3
+2024/11/11 23:49:00 5051 recived message: name:"5050"  message:"Reply"  timestamp:3
+2024/11/11 23:49:02 Server: :5052 - Recived message: message:"Connect"
+2024/11/11 23:49:02 Server :5052 - Formed a pair with:&{0x1400017e780} at Lamport time: 4 
+2024/11/11 23:49:02 5052 sending request at 1
+2024/11/11 23:49:02 Server: :5051 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:49:02 Server: :5050 - Recived message: name:"5052" message:"Request" timestamp:1
+2024/11/11 23:49:02 5051 recived message: name:"5052"  message:"Request"  timestamp:1
+2024/11/11 23:49:02 5050 recived message: name:"5052"  message:"Request"  timestamp:1
+2024/11/11 23:49:02 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:6
+2024/11/11 23:49:02 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:5
+2024/11/11 23:49:02 5052 recived message: name:"5051"  message:"Reply"  timestamp:6
+2024/11/11 23:49:02 5052 recived message: name:"5050"  message:"Reply"  timestamp:5
+2024/11/11 23:49:02 5052 ACCESSED THE CRITICAL SECTION 8
+2024/11/11 23:49:02 5052 Replying to stored replies (2) at 8
+2024/11/11 23:49:02 Server: :5051 - Recived message: name:"5052" message:"Reply" timestamp:9
+2024/11/11 23:49:02 Server: :5050 - Recived message: name:"5052" message:"Reply" timestamp:10
+2024/11/11 23:49:02 5051 recived message: name:"5052"  message:"Reply"  timestamp:9
+2024/11/11 23:49:02 5051 ACCESSED THE CRITICAL SECTION 10
+2024/11/11 23:49:02 5051 Replying to stored replies (2) at 10
+2024/11/11 23:49:02 5050 recived message: name:"5052"  message:"Reply"  timestamp:10
+2024/11/11 23:49:02 Server: :5050 - Recived message: name:"5051" message:"Reply" timestamp:11
+2024/11/11 23:49:02 Server: :5052 - Recived message: name:"5051" message:"Reply" timestamp:12
+2024/11/11 23:49:02 5050 recived message: name:"5051"  message:"Reply"  timestamp:11
+2024/11/11 23:49:02 5050 ACCESSED THE CRITICAL SECTION 12
+2024/11/11 23:49:02 5050 Replying to stored replies (2) at 12
+2024/11/11 23:49:02 5052 recived message: name:"5051"  message:"Reply"  timestamp:12
+2024/11/11 23:49:02 Error recived unexpected message: name:"5051"  message:"Reply"  timestamp:12
+2024/11/11 23:49:02 Server: :5052 - Recived message: name:"5050" message:"Reply" timestamp:13
+2024/11/11 23:49:02 Server: :5051 - Recived message: name:"5050" message:"Reply" timestamp:14
+2024/11/11 23:49:02 5052 recived message: name:"5050"  message:"Reply"  timestamp:13
+2024/11/11 23:49:02 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:13
+2024/11/11 23:49:02 5051 recived message: name:"5050"  message:"Reply"  timestamp:14
+2024/11/11 23:49:02 Error recived unexpected message: name:"5050"  message:"Reply"  timestamp:14

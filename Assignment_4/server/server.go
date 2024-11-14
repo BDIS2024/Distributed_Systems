@@ -90,7 +90,7 @@ func retrieveMessagesFromClient(stream proto.DmutexService_DmutexServer, errorCh
 
 		// HANDLE MESSAGE
 		fmt.Printf("Server - Recived message: %v\n", message)
-		fmt.Printf("Server: %s - Recived message: %v\n", port, message)
+		log.Printf("Server: %s - Recived message: %v\n", port, message)
 		var recievedTimestamp = message.Timestamp
 		counter = max(counter, recievedTimestamp) + 1
 

@@ -110,7 +110,7 @@ func replyRoutine() {
 
 		if message.Message == "Reply" {
 			if isRequestingCriticalSection() {
-				//storedReplies = append(storedReplies, message.Name) Remove // if not working
+				storedReplies = append(storedReplies, message.Name) // Remove // if not working
 				replies++
 				if replies >= len(knownNodes) { // check if we got enough replies
 					hasEnoughReplies <- true
@@ -271,7 +271,8 @@ func sendRequestToAllNodes() {
 	counter = counter + 1
 	requestTimeStamp = counter
 
-	log.Printf("%v sending request at %v", port, requestTimeStamp)
+	log.Printf("%v sending request at %v\n", port, requestTimeStamp)
+	fmt.Printf("%v sending request at %v\n", port, requestTimeStamp)
 
 	msg := proto.Message{
 		Name:      port,
@@ -294,7 +295,6 @@ func max(counter int32, comparecounter int32) int32 {
 	}
 	return counter
 }
-
 
 // https://stackoverflow.com/questions/37334119/how-to-delete-an-element-from-a-slice-in-golang
 func remove(s []string, i int) []string {

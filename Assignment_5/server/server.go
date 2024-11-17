@@ -32,10 +32,11 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fmt.Println("Server started listening on port :5050")
+
 	err = grpcServer.Serve(listener)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	fmt.Println("Server started listening of port :5050")
 }

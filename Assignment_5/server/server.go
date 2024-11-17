@@ -40,3 +40,5 @@ func main() {
 		log.Fatalln(err)
 	}
 }
+
+// TODO: LEADER ELECTION & REPLICATION

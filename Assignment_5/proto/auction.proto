@@ -1,0 +1,30 @@
+syntax = 'proto3';
+
+option go_package = 'Assignment_5/proto';
+
+message amount{
+	int64 bid = 1;
+	string bidder = 2;
+}
+
+message ack{
+	string outcome = 1;
+}
+
+message empty{
+}
+
+message outcome{
+	int64 highest_bid = 1;
+	string highest_bidder = 2;
+	string status = 3;
+}
+
+service AuctionService{
+	rpc Bid (amount) returns (ack){}
+	rpc Result (empty) returns (outcome){}
+}
+
+// to compile
+// cd to root directory (Assignment_5)
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative proto/auction.proto

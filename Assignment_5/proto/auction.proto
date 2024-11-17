@@ -3,7 +3,8 @@ syntax = 'proto3';
 option go_package = 'Assignment_5/proto';
 
 message amount{
-	int64 amount = 1;
+	int64 bid = 1;
+	string bidder = 2;
 }
 
 message ack{
@@ -14,8 +15,9 @@ message empty{
 }
 
 message outcome{
-	string highest_bid = 1;
+	int64 highest_bid = 1;
 	string highest_bidder = 2;
+	string status = 3;
 }
 
 service AuctionService{

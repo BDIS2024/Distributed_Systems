@@ -3,6 +3,7 @@ package main
 import (
 	proto "Assignment_5/proto"
 	"context"
+	"fmt"
 	"log"
 	"net"
 
@@ -14,20 +15,20 @@ type AuctionServer struct {
 }
 
 func (s *AuctionServer) Bid(context.Context, *proto.Amount) (*proto.Ack, error) {
-	log.Println("Bid")
+	fmt.Println("Bid")
 	return &proto.Ack{Outcome: "Success"}, nil
 }
 
 func (s *AuctionServer) Result(context.Context, *proto.Empty) (*proto.Outcome, error) {
-	log.Println("Result")
-	return &proto.Outcome{HighestBid: "500", HighestBidder: "Nicky"}, nil
+	fmt.Println("Result")
+	return &proto.Outcome{HighestBid: 500, HighestBidder: "Nicky", Status: "Ongoing"}, nil
 }
 
 func main() {
 	grpcServer := grpc.NewServer()
 	proto.RegisterAuctionServiceServer(grpcServer, &AuctionServer{})
 
-	listener, err := net.Listen("tcp", ":8080")
+	listener, err := net.Listen("tcp", ":5050")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -35,4 +36,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fmt.Println("Server started listening of port :5050")
 }

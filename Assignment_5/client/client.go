@@ -7,12 +7,15 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
+
+var name string
 
 func main() {
 	start := time.Now()
@@ -22,10 +25,11 @@ func main() {
 	}
 
 	client := proto.NewAuctionServiceClient(conn)
+	name = getName()
 
 	wait := make(chan bool)
 
-	go prompt()
+	go prompt(client)
 
 	for {
 		result, err := client.Result(context.Background(), &proto.Empty{})
@@ -46,15 +50,61 @@ func main() {
 	fmt.Printf("Time taken: %s\n", elapsed.String())
 }
 
-func prompt() {
+func prompt(client proto.AuctionServiceClient) {
 	for {
 		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("Enter your bid: ")
-		bid, err := reader.ReadString('\n')
-		bid = strings.TrimSpace(bid)
+		fmt.Println("To bid type 'Bid <amount>' and press enter.")
+		fmt.Println("To get the status of the auction type 'Result' and press enter.")
+		input, err := reader.ReadString('\n')
 		if err != nil {
 			log.Fatalln(err)
 		}
+		input = strings.TrimSpace(input)
+
+		switch {
+		case strings.HasPrefix(input, "Bid"):
+			bid(client, input)
+		case input == "Result":
+			result(client)
+		}
+
 		fmt.Println(bid)
 	}
+}
+
+func bid(client proto.AuctionServiceClient, bid string) {
+	amountstr := strings.Split(bid, " ")[1]
+	amountint, err := strconv.ParseInt(amountstr, 10, 64)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name})
+}
+
+func result(client proto.AuctionServiceClient) {
+	result, err := client.Result(context.Background(), &proto.Empty{})
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func getName() string {
+	var name string
+	var err error
+
+	if len(os.Args) > 1 {
+
+		name = os.Args[1]
+
+	} else {
+		fmt.Println("Enter your name:")
+		reader := bufio.NewReader(os.Stdin)
+		name, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	name = strings.TrimSpace(name)
+	return name
 }

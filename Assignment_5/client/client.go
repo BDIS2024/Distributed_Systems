@@ -67,8 +67,6 @@ func prompt(client proto.AuctionServiceClient) {
 		case input == "Result":
 			result(client)
 		}
-
-		fmt.Println(bid)
 	}
 }
 
@@ -79,12 +77,23 @@ func bid(client proto.AuctionServiceClient, bid string) {
 		log.Fatalln(err)
 	}
 	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name})
+	if err != nil {
+		log.Fatalln(err)
+
+	}
+	fmt.Printf("Bid with %s was: %s\n", bid, result.Outcome)
 }
 
 func result(client proto.AuctionServiceClient) {
 	result, err := client.Result(context.Background(), &proto.Empty{})
 	if err != nil {
 		log.Fatalln(err)
+	}
+	if result.Status == "Ongoing" {
+		fmt.Printf("The highest bid is %d by %s.\n", result.HighestBid, result.HighestBidder)
+	} else {
+		fmt.Println("Auction has ended.")
+		fmt.Printf("The highest bid was %d by %s.\n", result.HighestBid, result.HighestBidder)
 	}
 }
 

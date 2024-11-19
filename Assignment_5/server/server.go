@@ -2,10 +2,13 @@ package main
 
 import (
 	proto "Assignment_5/proto"
+	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"net"
+	"os"
+	"strings"
 
 	"google.golang.org/grpc"
 )
@@ -30,17 +33,41 @@ func main() {
 	grpcServer := grpc.NewServer()
 	proto.RegisterAuctionServiceServer(grpcServer, &AuctionServer{})
 
-	listener, err := net.Listen("tcp", ":5050")
+	port := getPort()
+
+	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	fmt.Println("Server started listening on port :5050")
-
+	fmt.Printf("Server started listening on port %s\n", port)
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
+}
+
+func getPort() string {
+	var port string
+	var err error
+
+	// Port
+	if len(os.Args) > 1 {
+
+		port = os.Args[1]
+
+	} else {
+		fmt.Println("Enter port number:")
+		reader := bufio.NewReader(os.Stdin)
+		port, err = reader.ReadString('\n')
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+	}
+
+	port = strings.TrimSpace(port)
+	port = ":" + port
+	return port
 }
 
 // TODO: LEADER ELECTION & REPLICATION

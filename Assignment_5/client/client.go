@@ -9,7 +9,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -20,9 +19,6 @@ var name string
 var auctionservers []string
 var auctionserverconnections []proto.AuctionServiceClient
 var output []*proto.Outcome
-
-// fix locks
-var lock sync.Mutex
 
 func main() {
 	start := time.Now()
@@ -36,7 +32,6 @@ func main() {
 	go prompt(wait)
 
 	for {
-		lock.Lock()
 		output = nil
 		for i := 0; i < len(auctionserverconnections); i++ {
 			result, err := auctionserverconnections[i].Result(context.Background(), &proto.Empty{})
@@ -46,7 +41,7 @@ func main() {
 			}
 			output = append(output, result)
 		}
-		lock.Unlock()
+
 		if len(output) == 0 {
 			fmt.Println("All auction servers are down.")
 			wait <- true
@@ -67,14 +62,14 @@ func main() {
 }
 
 func ongoing(output []*proto.Outcome) bool {
-	lock.Lock()
+
 	for _, outcome := range output {
 		if outcome.Status == "Ongoing" {
-			lock.Unlock()
+
 			return true
 		}
 	}
-	lock.Unlock()
+
 	return false
 }
 

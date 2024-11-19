@@ -110,7 +110,7 @@ func prompt(stop chan bool) {
 					if outcomes[0].Status == "Auction Ended" {
 						tense = "was"
 					}
-					fmt.Printf("!!!%v!!!\nThe highest bid %v  %d by %s.\n", outcomes[0].Status, tense, outcomes[0].HighestBid, outcomes[0].HighestBidder)
+					fmt.Printf("!!!%v!!!\nThe highest bid %v %d by %s.\n", outcomes[0].Status, tense, outcomes[0].HighestBid, outcomes[0].HighestBidder)
 				}
 			}
 		}

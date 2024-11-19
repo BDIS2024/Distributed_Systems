@@ -38,7 +38,7 @@ func (s *AuctionServer) Bid(arg1 context.Context, givenBid *proto.Amount) (*prot
 	// Not auctioning failure state
 	if !is_auctioning {
 		beginAuction(message_time)
-	} else if message_time.Before(end_time) {
+	} else if message_time.After(end_time) {
 		return &proto.Ack{Outcome: "No Longer Auctioning"}, nil
 	}
 

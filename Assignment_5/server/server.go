@@ -99,15 +99,21 @@ var is_auctioning bool
 var end_time time.Time
 
 func beginAuction(timetostart time.Time) {
-	fmt.Printf("!!!Auction started!!!\n")
+	fmt.Printf("!!!Auction started at %v!!!\n", time.Now())
 	is_auctioning = true
-	end_time = timetostart.Add(100 * time.Second)
-	go alert()
+	timeAdd, err := time.ParseDuration("100s")
+	if err != nil {
+		fmt.Println("Oopsie i hardcoded code?")
+	}
+
+	end_time = timetostart.Add(timeAdd)
+	go alert(timeAdd)
 }
 
-func alert() {
-	time.Sleep(100 * time.Second)
-	fmt.Printf("!!!Auction ended!!!\nHighest Bidder: %v\n", hb)
+func alert(sleepTime time.Duration) {
+
+	time.Sleep(sleepTime)
+	fmt.Printf("!!!Auction ended at %v !!!\nHighest Bidder: %v\n", time.Now(), hb)
 }
 
 func getPort() string {

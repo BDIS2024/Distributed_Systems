@@ -142,5 +142,3 @@ func getPort() string {
 	port = ":" + port
 	return port
 }
-
-// TODO: LEADER ELECTION & REPLICATION

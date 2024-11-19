@@ -103,7 +103,7 @@ var end_time time.Time
 func beginAuction(timetostart time.Time) {
 	fmt.Printf("!!!Auction started at %v!!!\n", time.Now())
 	is_auctioning = true
-	timeAdd, err := time.ParseDuration("10s")
+	timeAdd, err := time.ParseDuration("100s")
 	if err != nil {
 		fmt.Println("Oopsie i hardcoded code? // what ??")
 	}

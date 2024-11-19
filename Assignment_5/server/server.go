@@ -63,7 +63,7 @@ func (s *AuctionServer) Result(context.Context, *proto.Empty) (*proto.Outcome, e
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Not Started"}, nil
 	}
 
-	if time.Now().Before(end_time) {
+	if time.Now().After(end_time) {
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Ended"}, nil
 	} else {
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Ongoing"}, nil
@@ -101,12 +101,14 @@ var end_time time.Time
 func beginAuction(timetostart time.Time) {
 	fmt.Printf("!!!Auction started at %v!!!\n", time.Now())
 	is_auctioning = true
-	timeAdd, err := time.ParseDuration("100s")
+	timeAdd, err := time.ParseDuration("10s")
 	if err != nil {
-		fmt.Println("Oopsie i hardcoded code?")
+		fmt.Println("Oopsie i hardcoded code? // what ??")
 	}
 
 	end_time = timetostart.Add(timeAdd)
+
+	fmt.Printf("Auction supposed to end at %v\n", end_time)
 	go alert(timeAdd)
 }
 

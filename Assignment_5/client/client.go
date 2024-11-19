@@ -28,11 +28,13 @@ func main() {
 	name = getName()
 
 	wait := make(chan bool)
+	var checkoutput bool
 
 	go prompt(wait)
 
 	for {
 		output = nil
+		checkoutput = false
 		for i := 0; i < len(auctionserverconnections); i++ {
 			result, err := auctionserverconnections[i].Result(context.Background(), &proto.Empty{})
 			if err != nil {
@@ -41,15 +43,17 @@ func main() {
 				auctionserverconnections = removeConn(auctionserverconnections, i)
 				continue
 			}
+			checkoutput = true
 			output = append(output, result)
 		}
 
-		if len(output) == 0 {
+		if len(auctionserverconnections) == 0 {
+			fmt.Println(len(output))
 			fmt.Println("All auction servers are down.")
 			wait <- true
 			break
 		}
-		if !ongoing(output) {
+		if !ongoing(output) && checkoutput {
 			fmt.Println("Auction has ended.")
 			fmt.Printf("The highest bidder was %s with a bid of %d.\n", output[0].HighestBidder, output[0].HighestBid)
 			wait <- true
@@ -200,10 +204,16 @@ func getName() string {
 
 func removePort(s []string, i int) []string {
 	s[i] = s[len(s)-1]
+	fmt.Println(s[:len(s)-1])
 	return s[:len(s)-1]
+	//fmt.Println(append(s[:i], s[i+1:]...))
+	//return append(s[:i], s[i+1:]...)
 }
 
 func removeConn(s []proto.AuctionServiceClient, i int) []proto.AuctionServiceClient {
 	s[i] = s[len(s)-1]
+	fmt.Println(s[:len(s)-1])
 	return s[:len(s)-1]
+	//fmt.Println(append(s[:i], s[i+1:]...))
+	//return append(s[:i], s[i+1:]...)
 }

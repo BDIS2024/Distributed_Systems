@@ -48,7 +48,6 @@ func main() {
 		}
 
 		if len(auctionserverconnections) == 0 {
-			fmt.Println(len(output))
 			fmt.Println("All auction servers are down.")
 			wait <- true
 			break
@@ -203,7 +202,6 @@ func getName() string {
 
 func removePort(s []string, i int) []string {
 	s[i] = s[len(s)-1]
-	fmt.Println(s[:len(s)-1])
 	return s[:len(s)-1]
 	//fmt.Println(append(s[:i], s[i+1:]...))
 	//return append(s[:i], s[i+1:]...)
@@ -211,7 +209,6 @@ func removePort(s []string, i int) []string {
 
 func removeConn(s []proto.AuctionServiceClient, i int) []proto.AuctionServiceClient {
 	s[i] = s[len(s)-1]
-	fmt.Println(s[:len(s)-1])
 	return s[:len(s)-1]
 	//fmt.Println(append(s[:i], s[i+1:]...))
 	//return append(s[:i], s[i+1:]...)

@@ -70,13 +70,12 @@ func main() {
 func ongoing(output []*proto.Outcome) bool {
 
 	for _, outcome := range output {
-		if outcome.Status == "Ongoing" {
-
-			return true
+		if outcome.Status == "Auction Ended" {
+			return false
 		}
 	}
 
-	return false
+	return true
 }
 
 func prompt(stop chan bool) {
@@ -107,12 +106,12 @@ func prompt(stop chan bool) {
 				}
 				if len(outcomes) > 0 {
 					printSpaces()
-					if outcomes[0].Status == "Ongoing" {
-						fmt.Printf("The highest bid is %d by %s.\n", outcomes[0].HighestBid, outcomes[0].HighestBidder)
-					} else {
-						fmt.Println("Auction has ended.")
-						fmt.Printf("The highest bid was %d by %s.\n", outcomes[0].HighestBid, outcomes[0].HighestBidder)
+
+					tense := "is"
+					if outcomes[0].Status == "Auction Ended" {
+						tense = "was"
 					}
+					fmt.Printf("!!!%v!!!\nThe highest bid %v  %d by %s.\n", outcomes[0].Status, tense, outcomes[0].HighestBid, outcomes[0].HighestBidder)
 				}
 			}
 		}
@@ -147,7 +146,7 @@ func bid(client proto.AuctionServiceClient, bid string, acks *[]*proto.Ack) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name})
+	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name, BidTime: time.Now().Format(time.ANSIC)})
 	if err != nil {
 		log.Fatalln(err)
 

@@ -117,7 +117,7 @@ func beginAuction(timetostart time.Time) {
 func alert(sleepTime time.Duration) {
 
 	time.Sleep(sleepTime)
-	fmt.Printf("!!!Auction ended at %v !!!\nHighest Bidder: %v\n", time.Now(), hb)
+	fmt.Printf("!!!Auction ended at %v !!!\nHighest Bidder: %v, with a bid of %v\n", time.Now(), hb.bidder, hb.value)
 }
 
 func getPort() string {

@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -16,29 +17,44 @@ import (
 )
 
 var name string
+var auctionservers []string
+var auctionserverconnections []proto.AuctionServiceClient
+var output []*proto.Outcome
+
+// fix locks
+var lock sync.Mutex
 
 func main() {
 	start := time.Now()
-	conn, err := grpc.NewClient("localhost:5050", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err.Error())
-	}
+	auctionservers = append(auctionservers, "5050", "5051", "5052")
+	connectToServers()
 
-	client := proto.NewAuctionServiceClient(conn)
 	name = getName()
 
 	wait := make(chan bool)
 
-	go prompt(client, wait)
+	go prompt(wait)
 
 	for {
-		result, err := client.Result(context.Background(), &proto.Empty{})
-		if err != nil {
-			log.Fatalln(err)
+		lock.Lock()
+		output = nil
+		for i := 0; i < len(auctionserverconnections); i++ {
+			result, err := auctionserverconnections[i].Result(context.Background(), &proto.Empty{})
+			if err != nil {
+				fmt.Printf("Auctionserver %s is down.\n", auctionservers[i])
+				continue
+			}
+			output = append(output, result)
 		}
-		if result.Status != "Ongoing" {
+		lock.Unlock()
+		if len(output) == 0 {
+			fmt.Println("All auction servers are down.")
+			wait <- true
+			break
+		}
+		if !ongoing(output) {
 			fmt.Println("Acution has ended.")
-			fmt.Printf("The highest bidder was %s with a bid of %d.\n", result.HighestBidder, result.HighestBid)
+			fmt.Printf("The highest bidder was %s with a bid of %d.\n", output[0].HighestBidder, output[0].HighestBid)
 			wait <- true
 			break
 		}
@@ -50,7 +66,19 @@ func main() {
 	fmt.Printf("Time taken: %s\n", elapsed.String())
 }
 
-func prompt(client proto.AuctionServiceClient, stop chan bool) {
+func ongoing(output []*proto.Outcome) bool {
+	lock.Lock()
+	for _, outcome := range output {
+		if outcome.Status == "Ongoing" {
+			lock.Unlock()
+			return true
+		}
+	}
+	lock.Unlock()
+	return false
+}
+
+func prompt(stop chan bool) {
 	inputchannel := make(chan string)
 
 	go input(inputchannel, stop)
@@ -63,9 +91,18 @@ func prompt(client proto.AuctionServiceClient, stop chan bool) {
 		case input := <-inputchannel:
 			switch {
 			case strings.HasPrefix(input, "bid"):
-				bid(client, input)
+				var acks []*proto.Ack
+				for _, auctionserver := range auctionserverconnections {
+					bid(auctionserver, input, &acks)
+				}
+				if len(acks) > 0 {
+					printSpaces()
+					fmt.Printf("Bid with %s was: %s\n", input, acks[0].Outcome)
+				}
 			case input == "result":
-				result(client)
+				for _, auctionserver := range auctionserverconnections {
+					result(auctionserver)
+				}
 			}
 		}
 	}
@@ -93,7 +130,7 @@ func input(inputchannel chan string, stop chan bool) {
 	}
 }
 
-func bid(client proto.AuctionServiceClient, bid string) {
+func bid(client proto.AuctionServiceClient, bid string, acks *[]*proto.Ack) {
 	amountstr := strings.Split(bid, " ")[1]
 	amountint, err := strconv.ParseInt(amountstr, 10, 64)
 	if err != nil {
@@ -104,8 +141,7 @@ func bid(client proto.AuctionServiceClient, bid string) {
 		log.Fatalln(err)
 
 	}
-	printSpaces()
-	fmt.Printf("Bid with %s was: %s\n", bid, result.Outcome)
+	*acks = append(*acks, result)
 }
 
 func result(client proto.AuctionServiceClient) {
@@ -128,6 +164,18 @@ func printSpaces() {
 	}
 }
 
+func connectToServers() {
+	for _, server := range auctionservers {
+		hostname := "localhost:" + server
+		conn, err := grpc.NewClient(hostname, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		client := proto.NewAuctionServiceClient(conn)
+		auctionserverconnections = append(auctionserverconnections, client)
+	}
+}
+
 func getName() string {
 	var name string
 	var err error
@@ -147,4 +195,9 @@ func getName() string {
 
 	name = strings.TrimSpace(name)
 	return name
+}
+
+func remove(s []string, i int) []string {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }

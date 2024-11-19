@@ -29,7 +29,7 @@ func main() {
 
 	wait := make(chan bool)
 
-	go prompt(client)
+	go prompt(client, wait)
 
 	for {
 		result, err := client.Result(context.Background(), &proto.Empty{})
@@ -50,22 +50,45 @@ func main() {
 	fmt.Printf("Time taken: %s\n", elapsed.String())
 }
 
-func prompt(client proto.AuctionServiceClient) {
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		fmt.Println("To bid type 'Bid <amount>' and press enter.")
-		fmt.Println("To get the status of the auction type 'Result' and press enter.")
-		input, err := reader.ReadString('\n')
-		if err != nil {
-			log.Fatalln(err)
-		}
-		input = strings.TrimSpace(input)
+func prompt(client proto.AuctionServiceClient, stop chan bool) {
+	inputchannel := make(chan string)
 
-		switch {
-		case strings.HasPrefix(input, "Bid"):
-			bid(client, input)
-		case input == "Result":
-			result(client)
+	go input(inputchannel, stop)
+
+	for {
+		select {
+		case <-stop:
+			stop <- true
+			return
+		case input := <-inputchannel:
+			switch {
+			case strings.HasPrefix(input, "bid"):
+				bid(client, input)
+			case input == "result":
+				result(client)
+			}
+		}
+	}
+}
+
+func input(inputchannel chan string, stop chan bool) {
+	for {
+		select {
+		case <-stop:
+			stop <- true
+			return
+		default:
+			reader := bufio.NewReader(os.Stdin)
+			fmt.Println("To bid type 'Bid <amount>' and press enter.")
+			fmt.Println("To get the status of the auction type 'Result' and press enter.")
+			input, err := reader.ReadString('\n')
+			if err != nil {
+				log.Fatalln(err)
+			}
+			input = strings.TrimSpace(input)
+			input = strings.ToLower(input)
+			inputchannel <- input
+			time.Sleep(1 * time.Second)
 		}
 	}
 }
@@ -81,6 +104,7 @@ func bid(client proto.AuctionServiceClient, bid string) {
 		log.Fatalln(err)
 
 	}
+	printSpaces()
 	fmt.Printf("Bid with %s was: %s\n", bid, result.Outcome)
 }
 
@@ -89,11 +113,18 @@ func result(client proto.AuctionServiceClient) {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	printSpaces()
 	if result.Status == "Ongoing" {
 		fmt.Printf("The highest bid is %d by %s.\n", result.HighestBid, result.HighestBidder)
 	} else {
 		fmt.Println("Auction has ended.")
 		fmt.Printf("The highest bid was %d by %s.\n", result.HighestBid, result.HighestBidder)
+	}
+}
+
+func printSpaces() {
+	for i := 0; i < 100; i++ {
+		fmt.Println()
 	}
 }
 

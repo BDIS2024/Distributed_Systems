@@ -25,6 +25,8 @@ func (s *AuctionServer) Result(context.Context, *proto.Empty) (*proto.Outcome, e
 }
 
 func main() {
+	// Setup Server
+
 	grpcServer := grpc.NewServer()
 	proto.RegisterAuctionServiceServer(grpcServer, &AuctionServer{})
 

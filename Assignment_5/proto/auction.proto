@@ -11,8 +11,13 @@ message ack{
 	string outcome = 1;
 }
 
-message empty{
+message Message{
+	string sender = 1;
+	string message_type = 2;
+	string message_content = 3;
 }
+
+message empty {}
 
 message outcome{
 	int64 highest_bid = 1;

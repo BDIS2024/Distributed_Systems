@@ -5,16 +5,11 @@ option go_package = 'Assignment_5/proto';
 message amount{
 	int64 bid = 1;
 	string bidder = 2;
+	string bid_time = 3;
 }
 
 message ack{
 	string outcome = 1;
-}
-
-message Message{
-	string sender = 1;
-	string message_type = 2;
-	string message_content = 3;
 }
 
 message empty {}

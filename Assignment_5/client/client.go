@@ -100,8 +100,18 @@ func prompt(stop chan bool) {
 					fmt.Printf("Bid with %s was: %s\n", input, acks[0].Outcome)
 				}
 			case input == "result":
+				var outcomes []*proto.Outcome
 				for _, auctionserver := range auctionserverconnections {
-					result(auctionserver)
+					result(auctionserver, &outcomes)
+				}
+				if len(outcomes) > 0 {
+					printSpaces()
+					if outcomes[0].Status == "Ongoing" {
+						fmt.Printf("The highest bid is %d by %s.\n", outcomes[0].HighestBid, outcomes[0].HighestBidder)
+					} else {
+						fmt.Println("Auction has ended.")
+						fmt.Printf("The highest bid was %d by %s.\n", outcomes[0].HighestBid, outcomes[0].HighestBidder)
+					}
 				}
 			}
 		}
@@ -144,18 +154,12 @@ func bid(client proto.AuctionServiceClient, bid string, acks *[]*proto.Ack) {
 	*acks = append(*acks, result)
 }
 
-func result(client proto.AuctionServiceClient) {
+func result(client proto.AuctionServiceClient, outcomes *[]*proto.Outcome) {
 	result, err := client.Result(context.Background(), &proto.Empty{})
 	if err != nil {
 		log.Fatalln(err)
 	}
-	printSpaces()
-	if result.Status == "Ongoing" {
-		fmt.Printf("The highest bid is %d by %s.\n", result.HighestBid, result.HighestBidder)
-	} else {
-		fmt.Println("Auction has ended.")
-		fmt.Printf("The highest bid was %d by %s.\n", result.HighestBid, result.HighestBidder)
-	}
+	*outcomes = append(*outcomes, result)
 }
 
 func printSpaces() {

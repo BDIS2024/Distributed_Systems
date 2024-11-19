@@ -36,7 +36,9 @@ func main() {
 		for i := 0; i < len(auctionserverconnections); i++ {
 			result, err := auctionserverconnections[i].Result(context.Background(), &proto.Empty{})
 			if err != nil {
-				fmt.Printf("Auctionserver %s is down.\n", auctionservers[i])
+				fmt.Printf("Auctionserver %s has crashed.\n", auctionservers[i])
+				auctionservers = removePort(auctionservers, i)
+				auctionserverconnections = removeConn(auctionserverconnections, i)
 				continue
 			}
 			output = append(output, result)
@@ -48,7 +50,7 @@ func main() {
 			break
 		}
 		if !ongoing(output) {
-			fmt.Println("Acution has ended.")
+			fmt.Println("Auction has ended.")
 			fmt.Printf("The highest bidder was %s with a bid of %d.\n", output[0].HighestBidder, output[0].HighestBid)
 			wait <- true
 			break
@@ -196,7 +198,12 @@ func getName() string {
 	return name
 }
 
-func remove(s []string, i int) []string {
+func removePort(s []string, i int) []string {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
+}
+
+func removeConn(s []proto.AuctionServiceClient, i int) []proto.AuctionServiceClient {
 	s[i] = s[len(s)-1]
 	return s[:len(s)-1]
 }

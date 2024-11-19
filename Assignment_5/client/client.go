@@ -146,7 +146,7 @@ func bid(client proto.AuctionServiceClient, bid string, acks *[]*proto.Ack) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name, BidTime: time.Now().Format(time.ANSIC)})
+	result, err := client.Bid(context.Background(), &proto.Amount{Bid: amountint, Bidder: name, BidTime: time.Now().Format(time.RFC850)})
 	if err != nil {
 		log.Fatalln(err)
 

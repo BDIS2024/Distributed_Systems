@@ -30,7 +30,7 @@ var hb HighestBid
 func (s *AuctionServer) Bid(arg1 context.Context, givenBid *proto.Amount) (*proto.Ack, error) {
 	fmt.Printf("Recived bid from: %s at %s\n", givenBid.Bidder, givenBid.BidTime)
 
-	message_time, err := time.Parse(time.ANSIC, givenBid.BidTime)
+	message_time, err := time.Parse(time.RFC850, givenBid.BidTime)
 	if err != nil {
 		return &proto.Ack{Outcome: "Unsupported Time Format"}, nil
 	}
@@ -63,7 +63,9 @@ func (s *AuctionServer) Result(context.Context, *proto.Empty) (*proto.Outcome, e
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Not Started"}, nil
 	}
 
-	if time.Now().After(end_time) {
+	tmp := time.Now()
+	//fmt.Printf("Judgment: %v > %v = %v\n", tmp, end_time, tmp.After(end_time))
+	if tmp.After(end_time) {
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Ended"}, nil
 	} else {
 		return &proto.Outcome{HighestBid: hb.value, HighestBidder: hb.bidder, Status: "Auction Ongoing"}, nil

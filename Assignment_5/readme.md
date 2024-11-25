@@ -1,10 +1,10 @@
 How to run application/demonstration:
 
 ## Setting up the servers
-    <ol>
-        <li>Run 3 different instances of the server.go file in the server folder</li>
-        <li>Provide a port number for each of the different instances. The port numbers are to be: 5050 , 5051 , 5052</li>
-    </ol>
+<ol>
+    <li>Run 3 different instances of the server.go file in the server folder</li>
+    <li>Provide a port number for each of the different instances. The port numbers are to be: 5050 , 5051 , 5052</li>
+</ol>
 (NOTE: This step can also be done automatically on windows machines by running the run_servers.bat file)
 
 ## Running a client

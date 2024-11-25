@@ -21,6 +21,14 @@ var auctionserverconnections []proto.AuctionServiceClient
 var output []*proto.Outcome
 
 func main() {
+	//logs
+	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+
 	start := time.Now()
 	auctionservers = append(auctionservers, "5050", "5051", "5052")
 	connectToServers()
@@ -38,6 +46,7 @@ func main() {
 		for i := 0; i < len(auctionserverconnections); i++ {
 			result, err := auctionserverconnections[i].Result(context.Background(), &proto.Empty{})
 			if err != nil {
+				log.Printf("Client: %v... Auctionserver %s has crashed.\n", name, auctionservers[i])
 				fmt.Printf("Auctionserver %s has crashed.\n", auctionservers[i])
 				auctionservers = removePort(auctionservers, i)
 				auctionserverconnections = removeConn(auctionserverconnections, i)
@@ -48,11 +57,14 @@ func main() {
 		}
 
 		if len(auctionserverconnections) == 0 {
+			log.Printf("Client: %v... All auction servers are down.\n", name)
 			fmt.Println("All auction servers are down.")
 			wait <- true
 			break
 		}
 		if !ongoing(output) && checkoutput {
+			log.Printf("Client: %v...  Auction has ended. The highest bidder was %s with a bid of %d.\n", name, output[0].HighestBidder, output[0].HighestBid)
+
 			fmt.Println("Auction has ended.")
 			fmt.Printf("The highest bidder was %s with a bid of %d.\n", output[0].HighestBidder, output[0].HighestBid)
 			wait <- true
@@ -62,6 +74,7 @@ func main() {
 
 	<-wait
 	elapsed := time.Since(start)
+	log.Printf("Client: %v... Program done. Time taken: %s\n", name, elapsed.String())
 	fmt.Println("Program done.")
 	fmt.Printf("Time taken: %s\n", elapsed.String())
 }
@@ -96,6 +109,7 @@ func prompt(stop chan bool) {
 				}
 				if len(acks) > 0 {
 					printSpaces()
+					log.Printf("Client: %v... Bid with %s was: %s\n", name, input, acks[0].Outcome)
 					fmt.Printf("Bid with %s was: %s\n", input, acks[0].Outcome)
 				}
 			case input == "result":
@@ -110,6 +124,7 @@ func prompt(stop chan bool) {
 					if outcomes[0].Status == "Auction Ended" {
 						tense = "was"
 					}
+					log.Printf("Client: %v... !!!%v!!! The highest bid %v %d by %s.\n", name, outcomes[0].Status, tense, outcomes[0].HighestBid, outcomes[0].HighestBidder)
 					fmt.Printf("!!!%v!!!\nThe highest bid %v %d by %s.\n", outcomes[0].Status, tense, outcomes[0].HighestBid, outcomes[0].HighestBidder)
 				}
 			}

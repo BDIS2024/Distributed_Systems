@@ -1,0 +1,49 @@
+2024/11/25 14:58:26 Server started listening on port :5050
+2024/11/25 14:58:32 Server started listening on port :5051
+2024/11/25 14:58:39 Server started listening on port :5052
+2024/11/25 14:59:07 Received bid from: Nicky at Monday, 25-Nov-24 14:59:07 CET
+2024/11/25 14:59:07 Port: 5050... Auction supposed to end at 2024-11-25 15:00:47 +0100 CET
+2024/11/25 14:59:07 Received bid from: Nicky at Monday, 25-Nov-24 14:59:07 CET
+2024/11/25 14:59:07 Port: 5051... Auction supposed to end at 2024-11-25 15:00:47 +0100 CET
+2024/11/25 14:59:07 Received bid from: Nicky at Monday, 25-Nov-24 14:59:07 CET
+2024/11/25 14:59:07 Port: 5052... Auction supposed to end at 2024-11-25 15:00:47 +0100 CET
+2024/11/25 14:59:07 Client: Nicky... Bid with bid 100 was: Success
+2024/11/25 14:59:11 Client: Markus... !!!Auction Ongoing!!! The highest bid is 100 by Nicky.
+2024/11/25 14:59:15 Received bid from: Markus at Monday, 25-Nov-24 14:59:15 CET
+2024/11/25 14:59:15 Received bid from: Markus at Monday, 25-Nov-24 14:59:15 CET
+2024/11/25 14:59:15 Received bid from: Markus at Monday, 25-Nov-24 14:59:15 CET
+2024/11/25 14:59:15 Client: Markus... Bid with bid 200 was: Success
+2024/11/25 14:59:19 Client: Nicky... Auctionserver 5050 has crashed.
+2024/11/25 14:59:19 Client: Markus... Auctionserver 5050 has crashed.
+2024/11/25 14:59:24 Client: Nicky... !!!Auction Ongoing!!! The highest bid is 200 by Markus.
+2024/11/25 14:59:27 Received bid from: Nicky at Monday, 25-Nov-24 14:59:27 CET
+2024/11/25 14:59:27 Received bid from: Nicky at Monday, 25-Nov-24 14:59:27 CET
+2024/11/25 14:59:27 Client: Nicky... Bid with bid 300 was: Success
+2024/11/25 14:59:29 Client: Markus... !!!Auction Ongoing!!! The highest bid is 300 by Nicky.
+2024/11/25 14:59:31 Received bid from: Markus at Monday, 25-Nov-24 14:59:31 CET
+2024/11/25 14:59:31 Received bid from: Markus at Monday, 25-Nov-24 14:59:31 CET
+2024/11/25 14:59:31 Client: Markus... Bid with bid 400 was: Success
+2024/11/25 14:59:41 Client: Markus... !!!Auction Ongoing!!! The highest bid is 400 by Markus.
+2024/11/25 14:59:46 Client: Nicky... !!!Auction Ongoing!!! The highest bid is 400 by Markus.
+2024/11/25 14:59:50 Received bid from: Nicky at Monday, 25-Nov-24 14:59:50 CET
+2024/11/25 14:59:50 Received bid from: Nicky at Monday, 25-Nov-24 14:59:50 CET
+2024/11/25 14:59:50 Client: Nicky... Bid with bid 400 was: Denied - Value lower than highest bidder
+2024/11/25 15:00:03 Received bid from: Nicky at Monday, 25-Nov-24 15:00:03 CET
+2024/11/25 15:00:03 Received bid from: Nicky at Monday, 25-Nov-24 15:00:03 CET
+2024/11/25 15:00:03 Client: Nicky... Bid with bid 500 was: Success
+2024/11/25 15:00:08 Client: Nicky... !!!Auction Ongoing!!! The highest bid is 500 by Nicky.
+2024/11/25 15:00:13 Client: Markus... !!!Auction Ongoing!!! The highest bid is 500 by Nicky.
+2024/11/25 15:00:19 Received bid from: Markus at Monday, 25-Nov-24 15:00:19 CET
+2024/11/25 15:00:19 Received bid from: Markus at Monday, 25-Nov-24 15:00:19 CET
+2024/11/25 15:00:19 Client: Markus... Bid with bid 500 was: Denied - Value lower than highest bidder
+2024/11/25 15:00:24 Received bid from: Markus at Monday, 25-Nov-24 15:00:24 CET
+2024/11/25 15:00:24 Received bid from: Markus at Monday, 25-Nov-24 15:00:24 CET
+2024/11/25 15:00:24 Client: Markus... Bid with bid 600 was: Success
+2024/11/25 15:00:27 Client: Markus... !!!Auction Ongoing!!! The highest bid is 600 by Markus.
+2024/11/25 15:00:30 Client: Nicky... !!!Auction Ongoing!!! The highest bid is 600 by Markus.
+2024/11/25 15:00:47 Client: Markus...  Auction has ended. The highest bidder was Markus with a bid of 600.
+2024/11/25 15:00:47 Client: Nicky...  Auction has ended. The highest bidder was Markus with a bid of 600.
+2024/11/25 15:00:47 Client: Markus... Program done. Time taken: 1m52.199174s
+2024/11/25 15:00:47 Client: Nicky... Program done. Time taken: 1m54.0668634s
+2024/11/25 15:00:47 Port: 5051 ... !!!Auction ended at 2024-11-25 15:00:47.584488 +0100 CET m=+160.852659501 !!! Highest Bidder: Markus, with a bid of 600
+2024/11/25 15:00:47 Port: 5052 ... !!!Auction ended at 2024-11-25 15:00:47.5850173 +0100 CET m=+129.589697301 !!! Highest Bidder: Markus, with a bid of 600

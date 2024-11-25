@@ -26,9 +26,11 @@ type HighestBid struct {
 }
 
 var hb HighestBid
+var port string
 
 func (s *AuctionServer) Bid(arg1 context.Context, givenBid *proto.Amount) (*proto.Ack, error) {
-	fmt.Printf("Recived bid from: %s at %s\n", givenBid.Bidder, givenBid.BidTime)
+	log.Printf("Received bid from: %s at %s\n", givenBid.Bidder, givenBid.BidTime)
+	fmt.Printf("Received bid from: %s at %s\n", givenBid.Bidder, givenBid.BidTime)
 
 	message_time, err := time.Parse(time.RFC850, givenBid.BidTime)
 	if err != nil {
@@ -75,6 +77,14 @@ func (s *AuctionServer) Result(context.Context, *proto.Empty) (*proto.Outcome, e
 }
 
 func main() {
+	//logs
+	f, err := os.OpenFile("../logs", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	defer f.Close()
+	log.SetOutput(f)
+
 	hb = HighestBid{value: 0, bidder: "No Bidder"}
 	is_auctioning = false
 
@@ -90,6 +100,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	log.Printf("Server started listening on port %s\n", port)
 	fmt.Printf("Server started listening on port %s\n", port)
 	err = grpcServer.Serve(listener)
 	if err != nil {
@@ -110,6 +121,7 @@ func beginAuction(timetostart time.Time) {
 
 	end_time = timetostart.Add(timeAdd)
 
+	log.Printf("Port: %s... Auction supposed to end at %v\n", port, end_time)
 	fmt.Printf("Auction supposed to end at %v\n", end_time)
 	go alert(timeAdd)
 }
@@ -117,6 +129,7 @@ func beginAuction(timetostart time.Time) {
 func alert(sleepTime time.Duration) {
 
 	time.Sleep(sleepTime)
+	log.Printf("Port: %s... !!!Auction ended at %v !!! Highest Bidder: %v, with a bid of %v\n", port, time.Now(), hb.bidder, hb.value)
 	fmt.Printf("!!!Auction ended at %v !!!\nHighest Bidder: %v, with a bid of %v\n", time.Now(), hb.bidder, hb.value)
 }
 
